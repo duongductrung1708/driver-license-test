@@ -1,0 +1,188 @@
+[
+  {
+    "id": 1,
+    "question": "Khi điều khiển xe mô tô hai bánh, xe mô tô ba bánh, xe gắn máy, những hành vi nào không được phép?",
+    "answers": [
+      "Buông cả hai tay hoặc đi xe bằng một bánh đối với xe hai bánh; đi xe bằng hai bánh đối với xe ba bánh",
+      "Sử dụng xe để kéo, đẩy xe khác, vật khác; sử dụng xe để chở người hoặc hàng hóa trên xe; để chân chống quẹt xuống đất và các hành vi khác gây mất trật tự an toàn giao thông",
+      "Chạy đúng tốc độ quy định và chấp hành đúng quy tắc giao thông đường bộ",
+      "Cả ý 1 và ý 2"
+    ],
+    "correctAnswer": 3,
+    "isDiemLiet": true,
+    "explanation": "Cả hai hành vi trong ý 1 và ý 2 đều là những hành vi nguy hiểm không được phép khi điều khiển xe mô tô."
+  },
+  {
+    "id": 2,
+    "question": "Tại nơi đường giao nhau, khi đèn điều khiển giao thông có tín hiệu vàng, người điều khiển phương tiện phải thực hiện như thế nào?",
+    "answers": [
+      "Phải cho xe dừng lại trước vạch dừng, trừ trường hợp đã đi quá vạch dừng thì được đi tiếp",
+      "Phải cho xe nhanh chóng vượt qua vạch dừng để đi tiếp",
+      "Phải giảm tốc độ, quan sát, nhường đường cho người đi bộ qua đường",
+      "Tất cả các ý trên"
+    ],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Khi đèn vàng, xe phải dừng lại trước vạch dừng, trừ khi đã đi quá vạch dừng thì được đi tiếp."
+  },
+  {
+    "id": 3,
+    "question": "Trên đường bộ trong khu vực đông dân cư, xe mô tô hai bánh, xe mô tô ba bánh, xe gắn máy tham gia giao thông với tốc độ tối đa cho phép là bao nhiêu?",
+    "answers": [
+      "60 km/h",
+      "50 km/h", 
+      "40 km/h",
+      "30 km/h"
+    ],
+    "correctAnswer": 2,
+    "isDiemLiet": false,
+    "explanation": "Trong khu vực đông dân cư, xe mô tô hai bánh, xe mô tô ba bánh, xe gắn máy có tốc độ tối đa là 40 km/h."
+  },
+  {
+    "id": 4,
+    "question": "Người điều khiển xe mô tô, xe gắn máy trên đường mà trong máu có nồng độ cồn vượt quá bao nhiêu thì bị cấm?",
+    "answers": [
+      "Nồng độ cồn vượt quá 0,25 miligam/1 lít khí thở",
+      "Nồng độ cồn vượt quá 0,3 miligam/1 lít khí thở",
+      "Nồng độ cồn vượt quá 0,4 miligam/1 lít khí thở",
+      "Nồng độ cồn vượt quá 0,5 miligam/1 lít khí thở"
+    ],
+    "correctAnswer": 0,
+    "isDiemLiet": true,
+    "explanation": "Người điều khiển xe mô tô, xe gắn máy trên đường mà trong máu có nồng độ cồn vượt quá 0,25 miligam/1 lít khí thở thì bị cấm."
+  },
+  {
+    "id": 5,
+    "question": "Trên đường có nhiều làn đường, người điều khiển phương tiện tham gia giao thông sử dụng làn đường như thế nào?",
+    "answers": [
+      "Trên đường có nhiều làn đường cho xe đi cùng chiều được phân biệt bằng vạch kẻ phân làn đường, người điều khiển phương tiện phải cho xe đi trong một làn đường và chỉ được chuyển làn đường ở những nơi cho phép",
+      "Trên đường một chiều có vạch kẻ phân làn đường, xe thô sơ phải đi trên làn đường bên phải trong cùng, xe cơ giới, xe máy chuyên dùng đi trên làn đường bên trái",
+      "Phương tiện tham gia giao thông đường bộ di chuyển với tốc độ thấp hơn phải đi về bên phải",
+      "Tất cả các ý trên"
+    ],
+    "correctAnswer": 3,
+    "isDiemLiet": false,
+    "explanation": "Tất cả các quy định trên đều đúng về việc sử dụng làn đường."
+  },
+  {
+    "id": 6,
+    "question": "Khi gặp hiệu lệnh của người điều khiển giao thông thì người tham gia giao thông phải thực hiện như thế nào?",
+    "answers": [
+      "Người tham gia giao thông ở hướng đối diện phải dừng lại, người tham gia giao thông ở hướng được đi theo tay chỉ của người điều khiển được đi",
+      "Người tham gia giao thông ở tất cả các hướng phải dừng lại",
+      "Người tham gia giao thông được đi ở tất cả các hướng",
+      "Tất cả các ý trên"
+    ],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Khi gặp hiệu lệnh của người điều khiển giao thông, người tham gia giao thông ở hướng đối diện phải dừng lại, người tham gia giao thông ở hướng được đi theo tay chỉ của người điều khiển được đi."
+  },
+  {
+    "id": 7,
+    "question": "Tại nơi đường giao nhau, khi người điều khiển giao thông ra hiệu lệnh bằng tay phải giơ thẳng đứng thì người tham gia giao thông phải đi như thế nào?",
+    "answers": [
+      "Người tham gia giao thông ở tất cả các hướng phải dừng lại",
+      "Người tham gia giao thông ở hướng đối diện phải dừng lại, người tham gia giao thông ở hướng được đi theo tay chỉ của người điều khiển được đi",
+      "Người tham gia giao thông được đi ở tất cả các hướng",
+      "Tất cả các ý trên"
+    ],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Khi người điều khiển giao thông ra hiệu lệnh bằng tay phải giơ thẳng đứng thì người tham gia giao thông ở tất cả các hướng phải dừng lại."
+  },
+  {
+    "id": 8,
+    "question": "Tại nơi đường giao nhau, khi người điều khiển giao thông ra hiệu lệnh bằng hai tay hoặc một tay giang ngang thì những loại xe nào phải dừng lại?",
+    "answers": [
+      "Tất cả các loại xe ở tất cả các hướng",
+      "Tất cả các loại xe ở hướng đối diện",
+      "Tất cả các loại xe ở hướng được đi theo tay chỉ của người điều khiển",
+      "Tất cả các loại xe ở hướng đối diện và hướng được đi theo tay chỉ của người điều khiển"
+    ],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Khi người điều khiển giao thông ra hiệu lệnh bằng hai tay hoặc một tay giang ngang thì tất cả các loại xe ở tất cả các hướng phải dừng lại."
+  },
+  {
+    "id": 9,
+    "question": "Tại nơi đường giao nhau, khi người điều khiển giao thông ra hiệu lệnh tay trái giơ thẳng đứng thì người tham gia giao thông phải đi như thế nào?",
+    "answers": [
+      "Người tham gia giao thông ở tất cả các hướng phải dừng lại",
+      "Người tham gia giao thông ở hướng đối diện phải dừng lại, người tham gia giao thông ở hướng được đi theo tay chỉ của người điều khiển được đi",
+      "Người tham gia giao thông được đi ở tất cả các hướng",
+      "Tất cả các ý trên"
+    ],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Khi người điều khiển giao thông ra hiệu lệnh tay trái giơ thẳng đứng thì người tham gia giao thông ở tất cả các hướng phải dừng lại."
+  },
+  {
+    "id": 10,
+    "question": "Tại nơi đường giao nhau, khi người điều khiển giao thông ra hiệu lệnh bằng tay phải giơ thẳng đứng thì những loại xe nào phải dừng lại?",
+    "answers": [
+      "Tất cả các loại xe ở tất cả các hướng",
+      "Tất cả các loại xe ở hướng đối diện",
+      "Tất cả các loại xe ở hướng được đi theo tay chỉ của người điều khiển",
+      "Tất cả các loại xe ở hướng đối diện và hướng được đi theo tay chỉ của người điều khiển"
+    ],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Khi người điều khiển giao thông ra hiệu lệnh bằng tay phải giơ thẳng đứng thì tất cả các loại xe ở tất cả các hướng phải dừng lại."
+  },
+  {
+    "id": 11,
+    "question": "Biển báo nào dưới đây báo hiệu đường hai chiều?",
+    "image": "/images/bien-bao-duong-hai-chieu.png",
+    "answers": [
+      "Biển số 101",
+      "Biển số 102", 
+      "Biển số 103",
+      "Biển số 104"
+    ],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Biển số 101 báo hiệu đường hai chiều, xe được phép đi lại trên cả hai chiều."
+  },
+  {
+    "id": 12,
+    "question": "Biển báo nào dưới đây cấm xe mô tô đi vào?",
+    "image": "/images/bien-bao-cam-xe-mo-to.png",
+    "answers": [
+      "Biển số 101",
+      "Biển số 102",
+      "Biển số 103", 
+      "Biển số 104"
+    ],
+    "correctAnswer": 2,
+    "isDiemLiet": false,
+    "explanation": "Biển số 103 cấm xe mô tô đi vào khu vực được báo hiệu."
+  },
+  {
+    "id": 13,
+    "question": "Vạch kẻ đường nào dưới đây là vạch phân chia hai chiều xe chạy?",
+    "image": "/images/vach-ke-duong-phan-chia.png",
+    "answers": [
+      "Vạch đơn, đứt nét",
+      "Vạch đơn, liền nét",
+      "Vạch đôi, đứt nét",
+      "Vạch đôi, liền nét"
+    ],
+    "correctAnswer": 2,
+    "isDiemLiet": false,
+    "explanation": "Vạch đôi, đứt nét là vạch phân chia hai chiều xe chạy, xe được phép vượt qua."
+  },
+  {
+    "id": 14,
+    "question": "Tín hiệu đèn giao thông nào dưới đây cho phép xe đi thẳng?",
+    "image": "/images/den-giao-thong-xanh.png",
+    "answers": [
+      "Đèn xanh",
+      "Đèn vàng",
+      "Đèn đỏ",
+      "Tất cả các đèn trên"
+    ],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Đèn xanh cho phép xe đi thẳng và rẽ phải, rẽ trái theo quy định."
+  }
+]

@@ -1,70 +1,213 @@
-# Getting Started with Create React App
+# Ứng dụng Ôn Thi Bằng Lái Xe A1
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Ứng dụng web ReactJS để ôn tập và thi thử bằng lái xe máy A1 với bộ 250 câu hỏi (bao gồm câu điểm liệt).
 
-## Available Scripts
+## 🚀 Tính năng chính
 
-In the project directory, you can run:
+### 📚 Chế độ ôn tập
 
-### `npm start`
+- Hiển thị từng câu hỏi với giải thích chi tiết
+- Điều hướng câu trước/sau
+- Bộ lọc: Tất cả câu, chỉ câu điểm liệt, câu đã sai trước đó
+- Lưu câu sai vào localStorage để ôn tập sau
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 🎯 Chế độ thi thử
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- 25 câu hỏi ngẫu nhiên từ bộ 250 câu
+- Đồng hồ đếm ngược 19 phút
+- Điều kiện đạt: ≥ 21 câu đúng và không sai câu điểm liệt
+- Cảnh báo khi sai câu điểm liệt
 
-### `npm test`
+### 📊 Trang kết quả
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Hiển thị điểm số và thống kê chi tiết
+- Danh sách câu sai với đáp án đúng
+- Nút thi lại và ôn tập câu sai
 
-### `npm run build`
+## 🛠️ Công nghệ sử dụng
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **React 19.1.1** - Framework chính
+- **React Router DOM** - Điều hướng trang
+- **Material-UI (MUI)** - UI Components
+- **LocalStorage** - Lưu trữ dữ liệu người dùng
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 📁 Cấu trúc dự án
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+src/
+├── components/
+│   ├── QuizQuestion.jsx      # Component hiển thị câu hỏi
+│   ├── Timer.jsx            # Đồng hồ đếm ngược
+│   └── ProgressBar.jsx      # Thanh tiến trình
+├── pages/
+│   ├── Home.jsx             # Trang chủ
+│   ├── Practice.jsx         # Trang ôn tập
+│   ├── Exam.jsx             # Trang thi thử
+│   └── Result.jsx           # Trang kết quả
+├── data/
+│   └── questions.json       # Dữ liệu câu hỏi
+├── App.jsx                  # Component chính với routing
+└── index.js                 # Entry point
+```
 
-### `npm run eject`
+## 🚀 Cách chạy dự án
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Yêu cầu hệ thống
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Node.js (phiên bản 14 trở lên)
+- npm hoặc yarn
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Cài đặt và chạy
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. **Clone dự án** (nếu chưa có)
 
-## Learn More
+```bash
+git clone <repository-url>
+cd driver-license-test
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2. **Cài đặt dependencies**
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm install
+```
 
-### Code Splitting
+3. **Chạy ứng dụng**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+npm start
+```
 
-### Analyzing the Bundle Size
+4. **Mở trình duyệt**
+   Truy cập [http://localhost:3000](http://localhost:3000)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Build cho production
 
-### Making a Progressive Web App
+```bash
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 📝 Cấu trúc dữ liệu câu hỏi
 
-### Advanced Configuration
+File `src/data/questions.json` chứa mảng các câu hỏi với cấu trúc:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```json
+{
+  "id": 1,
+  "question": "Nội dung câu hỏi...",
+  "answers": ["Đáp án A", "Đáp án B", "Đáp án C", "Đáp án D"],
+  "correctAnswer": 0,
+  "isDiemLiet": true,
+  "explanation": "Giải thích đáp án..."
+}
+```
 
-### Deployment
+### Trường dữ liệu:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- `id`: ID duy nhất của câu hỏi
+- `question`: Nội dung câu hỏi
+- `answers`: Mảng 4 đáp án (A, B, C, D)
+- `correctAnswer`: Index của đáp án đúng (0-3)
+- `isDiemLiet`: Boolean - có phải câu điểm liệt không
+- `explanation`: Giải thích đáp án (hiển thị khi ôn tập)
 
-### `npm run build` fails to minify
+## 🎨 Giao diện
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **Responsive**: Hiển thị tốt trên desktop và mobile
+- **Material Design**: Sử dụng Material-UI với theme tùy chỉnh
+- **Màu sắc**: Xanh dương chủ đạo, xanh lá cho thành công, đỏ cho lỗi
+- **Typography**: Font system với trọng số phù hợp
+
+## 📱 Tính năng responsive
+
+- **Desktop**: Layout đầy đủ với sidebar và grid
+- **Tablet**: Layout thích ứng với màn hình vừa
+- **Mobile**: Layout tối ưu cho màn hình nhỏ
+
+## 💾 Lưu trữ dữ liệu
+
+Ứng dụng sử dụng `localStorage` để lưu:
+
+- Danh sách câu hỏi đã sai (`wrongAnswers`)
+- Tiến trình làm bài (nếu cần)
+
+## 🔧 Tùy chỉnh
+
+### Thêm câu hỏi mới
+
+1. Mở file `src/data/questions.json`
+2. Thêm câu hỏi mới theo cấu trúc đã định
+3. Đảm bảo `id` là duy nhất
+
+### Thay đổi theme
+
+Chỉnh sửa object `theme` trong `src/App.jsx`:
+
+```javascript
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#your-color",
+    },
+    // ...
+  },
+});
+```
+
+### Thay đổi thời gian thi
+
+Chỉnh sửa hằng số `EXAM_DURATION` trong `src/pages/Exam.jsx`:
+
+```javascript
+const EXAM_DURATION = 20 * 60; // 20 phút
+```
+
+## 🐛 Xử lý lỗi thường gặp
+
+### Lỗi "Module not found"
+
+```bash
+npm install
+```
+
+### Lỗi port đã được sử dụng
+
+```bash
+npm start -- --port 3001
+```
+
+### Lỗi Material-UI
+
+```bash
+npm install @mui/material @emotion/react @emotion/styled
+```
+
+## 📈 Mở rộng tương lai
+
+- [ ] Thêm bộ 600 câu hỏi
+- [ ] Chế độ thi theo chủ đề
+- [ ] Thống kê chi tiết hơn
+- [ ] Chế độ offline
+- [ ] PWA (Progressive Web App)
+- [ ] Dark mode
+- [ ] Đa ngôn ngữ
+
+## 📄 License
+
+MIT License - Xem file LICENSE để biết thêm chi tiết.
+
+## 👥 Đóng góp
+
+1. Fork dự án
+2. Tạo branch mới (`git checkout -b feature/AmazingFeature`)
+3. Commit thay đổi (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Tạo Pull Request
+
+## 📞 Liên hệ
+
+Nếu có câu hỏi hoặc góp ý, vui lòng tạo issue trên GitHub.
+
+---
+
+**Lưu ý**: Đây là ứng dụng học tập, không thay thế cho việc học chính thức. Hãy tham khảo tài liệu chính thức của Bộ GTVT để đảm bảo tính chính xác.
