@@ -204,7 +204,7 @@ const Result = () => {
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mr: 2 }}>
-                      Câu {answer.questionId}
+                      Câu {answer.questionNumber || answer.questionId}
                     </Typography>
                     {answer.isDiemLiet && (
                       <Chip 

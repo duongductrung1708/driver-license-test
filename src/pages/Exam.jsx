@@ -106,6 +106,7 @@ const Exam = () => {
       if (isAnswered) {
         allAnswersList.push({
           questionId: question.id,
+          questionNumber: index + 1, // Add question number (1-based index)
           question: question.question,
           image: question.image,
           answers: question.answers,
@@ -272,6 +273,7 @@ const Exam = () => {
           selectedAnswer={selectedAnswer}
           onAnswerSelect={handleAnswerSelect}
           isAnswered={false}
+          questionNumber={currentQuestionIndex + 1}
         />
       )}
 

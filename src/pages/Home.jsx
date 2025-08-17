@@ -62,7 +62,7 @@ const Home = () => {
     },
     {
       icon: <School sx={{ fontSize: 40, color: '#ff9800' }} />,
-      title: 'Ôn tập full',
+      title: 'Ôn tập toàn bộ',
       description: 'Ôn tập toàn bộ 250 câu hỏi',
       action: () => navigate('/practice', { state: { mode: 'full' } })
     },
@@ -182,7 +182,7 @@ const Home = () => {
           <Grid item xs={12} sm={4}>
             <Box sx={{ textAlign: 'center' }}>
               <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#2196f3' }}>
-                14
+                250
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Tổng số câu hỏi
@@ -192,7 +192,7 @@ const Home = () => {
           <Grid item xs={12} sm={4}>
             <Box sx={{ textAlign: 'center' }}>
               <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#f44336' }}>
-                2
+                20
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Câu điểm liệt
@@ -202,7 +202,7 @@ const Home = () => {
           <Grid item xs={12} sm={4}>
             <Box sx={{ textAlign: 'center' }}>
               <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#4caf50' }}>
-                12
+                230
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Câu thường

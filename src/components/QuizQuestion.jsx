@@ -16,7 +16,8 @@ const QuizQuestion = ({
   selectedAnswer, 
   onAnswerSelect, 
   showCorrectAnswer = false,
-  isAnswered = false 
+  isAnswered = false,
+  questionNumber = null
 }) => {
   const getAnswerStyle = (answerIndex) => {
     if (!isAnswered) {
@@ -60,7 +61,7 @@ const QuizQuestion = ({
         {/* Header với ID câu hỏi và badge điểm liệt */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" component="div" sx={{ mr: 2 }}>
-            Câu {question.id}
+            Câu {questionNumber !== null ? questionNumber : question.id}
           </Typography>
           {question.isDiemLiet && (
             <Chip 

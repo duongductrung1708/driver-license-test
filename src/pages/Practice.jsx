@@ -70,7 +70,23 @@ const Practice = () => {
     setCurrentQuestionIndex(0);
     setSelectedAnswer(null);
     setIsAnswered(false);
-  }, [filter, wrongAnswers, practiceMode]);
+  }, [filter, practiceMode]); // Removed wrongAnswers from dependencies
+
+  // Separate effect to handle wrongAnswers changes only when in wrong filter mode
+  useEffect(() => {
+    if (filter === 'wrong') {
+      const wrongQuestionIds = wrongAnswers.map(w => w.questionId);
+      const filtered = questionsData.filter(q => wrongQuestionIds.includes(q.id));
+      setFilteredQuestions(filtered);
+      
+      // Only reset if current question index is out of bounds
+      if (currentQuestionIndex >= filtered.length) {
+        setCurrentQuestionIndex(0);
+        setSelectedAnswer(null);
+        setIsAnswered(false);
+      }
+    }
+  }, [wrongAnswers, filter, currentQuestionIndex]);
 
   const currentQuestion = filteredQuestions[currentQuestionIndex];
 
@@ -196,6 +212,7 @@ const Practice = () => {
           selectedAnswer={selectedAnswer}
           onAnswerSelect={handleAnswerSelect}
           isAnswered={isAnswered}
+          questionNumber={currentQuestionIndex + 1}
         />
       )}
 
