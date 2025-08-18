@@ -9,19 +9,18 @@ import {
   Grid,
   Paper,
   Chip,
-  Divider,
   Alert
 } from '@mui/material';
 import { 
   School, 
   Quiz, 
-  DirectionsCar,
+  DirectionsBike,
   Speed,
   Warning,
   CheckCircle,
   History,
-  TrendingUp,
-  TrendingDown
+  Delete,
+  
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
@@ -51,6 +50,14 @@ const Home = () => {
     if (score >= 84) return '#4caf50'; // >= 21/25
     if (score >= 70) return '#ff9800';
     return '#f44336';
+  };
+
+  const handleClearHistory = () => {
+    if (examHistory.length === 0) return;
+    const confirmClear = window.confirm('Bạn có chắc muốn xóa toàn bộ lịch sử thi?');
+    if (!confirmClear) return;
+    localStorage.removeItem('examHistory');
+    setExamHistory([]);
   };
 
   const features = [
@@ -97,12 +104,12 @@ const Home = () => {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Header */}
       <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <DirectionsCar sx={{ fontSize: 80, color: '#2196f3', mb: 2 }} />
+        <DirectionsBike sx={{ fontSize: 80, color: '#2196f3', mb: 2 }} />
         <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-          Ôn Thi Bằng Lái Xe A1
+          Ôn Thi Bằng Lái Xe Máy A1 Online
         </Typography>
         <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-          Hệ thống ôn tập và thi thử bằng lái xe máy A1 với 14 câu hỏi mẫu
+          Hệ thống ôn tập và thi thử bằng lái xe máy A1 với 250 câu hỏi mẫu
         </Typography>
       </Box>
 
@@ -124,12 +131,14 @@ const Home = () => {
       </Paper>
 
       {/* Các chế độ học */}
-      <Grid container spacing={4} sx={{ mb: 6 }}>
+      <Grid container spacing={4} alignItems="stretch" sx={{ mb: 6 }}>
         {features.map((feature, index) => (
-          <Grid item xs={12} md={4} key={index}>
+          <Grid item xs={12} md={4} key={index} sx={{ display: 'flex' }}>
             <Card 
               sx={{ 
-                height: '100%', 
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
                 cursor: 'pointer',
                 transition: 'transform 0.2s, box-shadow 0.2s',
                 '&:hover': {
@@ -139,7 +148,7 @@ const Home = () => {
               }}
               onClick={feature.action}
             >
-              <CardContent sx={{ textAlign: 'center', p: 4 }}>
+              <CardContent sx={{ textAlign: 'center', p: 4, flexGrow: 1 }}>
                 <Box sx={{ mb: 2 }}>
                   {feature.icon}
                 </Box>
@@ -218,13 +227,24 @@ const Home = () => {
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
             Lịch sử thi thử
           </Typography>
-          <Button
-            variant="outlined"
-            startIcon={<History />}
-            onClick={() => setShowHistory(!showHistory)}
-          >
-            {showHistory ? 'Ẩn lịch sử' : 'Xem lịch sử'}
-          </Button>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="outlined"
+              startIcon={<History />}
+              onClick={() => setShowHistory(!showHistory)}
+            >
+              {showHistory ? 'Ẩn lịch sử' : 'Xem lịch sử'}
+            </Button>
+            <Button
+              variant="outlined"
+              color="error"
+              startIcon={<Delete />}
+              onClick={handleClearHistory}
+              disabled={examHistory.length === 0}
+            >
+              Xóa lịch sử
+            </Button>
+          </Box>
         </Box>
 
         {showHistory && (

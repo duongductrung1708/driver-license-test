@@ -2,7 +2,7 @@
   {
     "id": 1,
     "question": "Biển nào xe được phép rẽ trái?",
-    "image": "/images/1.jpg",
+    "image": "/images/30.jpg",
     "answers": [
       "Biển 1",
       "Biển 2",
@@ -15,7 +15,7 @@
   {
     "id": 2,
     "question": "Trong các biển dưới đây biển nào là biển 'Hết mọi lệnh cấm'?",
-    "image": "/images/2.jpg",
+    "image": "/images/29.jpg",
     "answers": [
       "Biển 1",
       "Biển 2",
@@ -55,7 +55,7 @@
   {
     "id": 5,
     "question": "Biển nào báo hiệu 'Đường giao nhau' của các tuyến đường cùng cấp?",
-    "image": "/images/5.jpg",
+    "image": "/images/28.jpg",
     "answers": [
       "Biển 1",
       "Biển 2",
