@@ -702,17 +702,15 @@
   },
   {
     "id": 57,
-    "question": "Biển nào là biển 'Tốc độ tối đa cho phép về ban đêm'?",
-    "image": "/images/22.jpg",
+    "question": "Khổ giới hạn của đường bộ được hiểu như thế nào là đúng?",
     "answers": [
-      "Biển 1 và Biển 2",
-      "Biển 1 và Biển 3",
-      "Biển 2 và Biển 3",
-      "Cả ba biển"
+      "Khổ giới hạn của đường bộ là khoảng trống có kích thước giới hạn về chiều rộng, chiều cao của đường bộ để các xe, bao gồm cả hàng hoá xếp trên xe đi qua được an toàn và được xác định theo quy chuẩn, tiêu chuẩn kỹ thuật của đường bộ",
+      "Là khoảng trống có kích thước giới hạn về chiều rộng của đường, cầu, bến phà, hầm trên đường bộ để các xe kể cả hàng hóa xếp trên xe đi qua được an toàn",
+      "Là khoảng trống có kích thước giới hạn về chiều cao của cầu, bến phà, hầm trên đường bộ để các xe đi qua được an toàn"
     ],
-    "correctAnswer": 1,
+    "correctAnswer": 0,
     "isDiemLiet": false,
-    "explanation": "Biển 1: Giao nhau đường sắt có rào chắm - Biển 2: Báo hiệu giao nhau đường 2 chiều - Biển 3: Giao nhau đường sắt vuông góc với đường bộ. Nên chọn biển 1 và 3."
+    "explanation": "Khổ giới hạn của đường bộ là khoảng trống có kích thước giới hạn về chiều rộng, chiều cao."
   },
   {
     "id": 58,
