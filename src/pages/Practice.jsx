@@ -32,6 +32,7 @@ const Practice = () => {
   const [filter, setFilter] = useState('all');
   const [filteredQuestions, setFilteredQuestions] = useState(questionsData);
   const [wrongAnswers, setWrongAnswers] = useState([]);
+  const [answeredQuestions, setAnsweredQuestions] = useState({});
 
   // Load wrong answers from localStorage
   useEffect(() => {
@@ -115,6 +116,10 @@ const Practice = () => {
     if (selectedAnswer === null) return;
     
     setIsAnswered(true);
+    setAnsweredQuestions(prev => ({
+      ...prev,
+      [currentQuestion.id]: true
+    }));
     
     // Save wrong answer to localStorage
     if (selectedAnswer !== currentQuestion.correctAnswer) {
@@ -132,8 +137,7 @@ const Practice = () => {
   };
 
   const getAnsweredCount = () => {
-    // Count questions that have been answered in current session
-    return 1; // For practice mode, we only track current question
+    return filteredQuestions.reduce((count, q) => count + (answeredQuestions[q.id] ? 1 : 0), 0);
   };
 
   return (
