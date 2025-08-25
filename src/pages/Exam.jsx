@@ -224,8 +224,8 @@ const Exam = () => {
             size="large"
             onClick={startExam}
             sx={{ 
-              backgroundColor: '#4caf50',
-              '&:hover': { backgroundColor: '#388e3c' }
+              backgroundColor: 'success.main',
+              '&:hover': { backgroundColor: 'success.dark' }
             }}
           >
             Bắt đầu thi
@@ -299,7 +299,7 @@ const Exam = () => {
           <Button
             variant="contained"
             onClick={handleFinishExam}
-            sx={{ backgroundColor: '#f44336' }}
+            sx={{ backgroundColor: 'error.main' }}
           >
             Nộp bài
           </Button>

@@ -20,6 +20,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import QuizQuestion from '../components/QuizQuestion';
 import ProgressBar from '../components/ProgressBar';
+import DiemLietStats from '../components/DiemLietStats';
 import questionsData from '../data/questions.json';
 
 const Practice = () => {
@@ -51,6 +52,9 @@ const Practice = () => {
       // For random mode, select 25 random questions
       const shuffled = [...questionsData].sort(() => 0.5 - Math.random());
       filtered = shuffled.slice(0, 25);
+    } else if (practiceMode === 'diemLiet') {
+      // For diemLiet mode, select only diemLiet questions
+      filtered = questionsData.filter(q => q.isDiemLiet);
     }
     
     // Then apply additional filters
@@ -140,12 +144,31 @@ const Practice = () => {
     return filteredQuestions.reduce((count, q) => count + (answeredQuestions[q.id] ? 1 : 0), 0);
   };
 
+  const getDiemLietStats = () => {
+    const diemLietQuestions = questionsData.filter(q => q.isDiemLiet);
+    const answeredDiemLiet = diemLietQuestions.filter(q => answeredQuestions[q.id]).length;
+    const correctDiemLiet = diemLietQuestions.filter(q => 
+      answeredQuestions[q.id] && !wrongAnswers.some(w => w.questionId === q.id)
+    ).length;
+    const wrongDiemLiet = diemLietQuestions.filter(q => 
+      wrongAnswers.some(w => w.questionId === q.id)
+    ).length;
+
+    return {
+      totalDiemLiet: diemLietQuestions.length,
+      answeredDiemLiet,
+      correctDiemLiet,
+      wrongDiemLiet
+    };
+  };
+
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
-          {practiceMode === 'random' ? 'Ôn tập 25 câu' : 'Ôn tập full'}
+          {practiceMode === 'random' ? 'Ôn tập 25 câu' : 
+           practiceMode === 'diemLiet' ? 'Học câu điểm liệt' : 'Ôn tập full'}
         </Typography>
         <Button 
           variant="outlined" 
@@ -157,23 +180,39 @@ const Practice = () => {
       </Box>
 
       {/* Practice Mode Info */}
-      <Paper sx={{ p: 2, mb: 3, backgroundColor: '#e3f2fd' }}>
+      <Paper sx={{ p: 2, mb: 3, backgroundColor: 'background.default' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="body1" sx={{ fontWeight: 500 }}>
             {practiceMode === 'random' 
               ? 'Chế độ ôn tập với 25 câu hỏi ngẫu nhiên từ bộ đề'
+              : practiceMode === 'diemLiet'
+              ? 'Chế độ học 20 câu điểm liệt quan trọng'
               : 'Chế độ ôn tập toàn bộ 250 câu hỏi'
             }
           </Typography>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => navigate('/practice', { 
-              state: { mode: practiceMode === 'random' ? 'full' : 'random' } 
-            })}
-          >
-            Chuyển sang {practiceMode === 'random' ? 'Ôn tập full' : 'Ôn tập 25 câu'}
-          </Button>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {practiceMode !== 'diemLiet' && (
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => navigate('/practice', { 
+                  state: { mode: practiceMode === 'random' ? 'full' : 'random' } 
+                })}
+              >
+                Chuyển sang {practiceMode === 'random' ? 'Ôn tập full' : 'Ôn tập 25 câu'}
+              </Button>
+            )}
+            <Button
+              variant="outlined"
+              size="small"
+              color="error"
+              onClick={() => navigate('/practice', { 
+                state: { mode: 'diemLiet' } 
+              })}
+            >
+              Học câu điểm liệt
+            </Button>
+          </Box>
         </Box>
       </Paper>
 
@@ -189,11 +228,14 @@ const Practice = () => {
               onChange={(e) => setFilter(e.target.value)}
             >
               <MenuItem value="all">
-                Tất cả câu hỏi ({practiceMode === 'random' ? '25 câu ngẫu nhiên' : questionsData.length})
+                Tất cả câu hỏi ({practiceMode === 'random' ? '25 câu ngẫu nhiên' : 
+                                practiceMode === 'diemLiet' ? '20 câu điểm liệt' : questionsData.length})
               </MenuItem>
-              <MenuItem value="diemLiet">
-                Chỉ câu điểm liệt ({practiceMode === 'random' ? 'Trong 25 câu' : questionsData.filter(q => q.isDiemLiet).length})
-              </MenuItem>
+              {practiceMode !== 'diemLiet' && (
+                <MenuItem value="diemLiet">
+                  Chỉ câu điểm liệt ({practiceMode === 'random' ? 'Trong 25 câu' : questionsData.filter(q => q.isDiemLiet).length})
+                </MenuItem>
+              )}
               <MenuItem value="wrong">
                 Câu đã sai trước đó ({wrongAnswers.length})
               </MenuItem>
@@ -208,6 +250,21 @@ const Practice = () => {
         total={filteredQuestions.length}
         answeredCount={getAnsweredCount()}
       />
+
+      {/* DiemLiet Stats */}
+      {practiceMode === 'diemLiet' && (
+        <DiemLietStats {...getDiemLietStats()} />
+      )}
+
+      {/* DiemLiet Warning */}
+      {practiceMode === 'diemLiet' && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <Typography variant="body2">
+            <strong>⚠️ Cảnh báo:</strong> Đây là câu điểm liệt! Nếu sai câu này trong bài thi thật, bạn sẽ bị trượt ngay lập tức. 
+            Hãy học kỹ và ghi nhớ đáp án chính xác.
+          </Typography>
+        </Alert>
+      )}
 
       {/* Question */}
       {currentQuestion && (
@@ -236,7 +293,7 @@ const Practice = () => {
             <Button
               variant="contained"
               onClick={handleSubmit}
-              sx={{ backgroundColor: '#4caf50' }}
+              sx={{ backgroundColor: 'success.main' }}
             >
               Kiểm tra đáp án
             </Button>
@@ -261,6 +318,7 @@ const Practice = () => {
           <strong>Hướng dẫn:</strong> Chọn đáp án và nhấn "Kiểm tra đáp án" để xem kết quả. 
           Sau đó bạn có thể chuyển sang câu tiếp theo hoặc câu trước đó.
           {practiceMode === 'random' && ' Trong chế độ ôn tập 25 câu, các câu hỏi được chọn ngẫu nhiên từ bộ đề.'}
+          {practiceMode === 'diemLiet' && ' Trong chế độ học câu điểm liệt, bạn sẽ học 20 câu hỏi quan trọng nhất.'}
         </Typography>
       </Alert>
 

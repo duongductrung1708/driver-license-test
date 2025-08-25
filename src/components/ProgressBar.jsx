@@ -6,7 +6,7 @@ const ProgressBar = ({ current, total, answeredCount }) => {
   const answeredProgress = (answeredCount / total) * 100;
 
   return (
-    <Box sx={{ mb: 3 }}>
+    <Box sx={{ mb: 3 }} className="slide-in-left">
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
         <Typography variant="body2" color="text.secondary">
           Câu {current} / {total}

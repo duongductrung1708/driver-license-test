@@ -48,9 +48,9 @@ const Result = () => {
   const score = Math.round((correctCount / totalQuestions) * 100);
 
   const getScoreColor = () => {
-    if (isPassed) return '#4caf50';
-    if (score >= 70) return '#ff9800';
-    return '#f44336';
+    if (isPassed) return 'success.main';
+    if (score >= 70) return 'warning.main';
+    return 'error.main';
   };
 
   const getScoreMessage = () => {
@@ -199,7 +199,7 @@ const Result = () => {
               <Card key={index} sx={{ 
                 mb: 2, 
                 border: answer.isCorrect ? '1px solid #4caf50' : '1px solid #f44336',
-                backgroundColor: answer.isCorrect ? '#f8fff8' : '#fff8f8'
+                backgroundColor: answer.isCorrect ? 'success.50' : 'error.50'
               }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -268,8 +268,8 @@ const Result = () => {
                           p: 1,
                           borderRadius: 1,
                           backgroundColor: 
-                            ansIndex === answer.correctAnswer ? '#e8f5e8' :
-                            ansIndex === answer.selectedAnswer ? '#ffeaea' : '#f5f5f5',
+                            ansIndex === answer.correctAnswer ? 'success.50' :
+                            ansIndex === answer.selectedAnswer ? 'error.50' : 'background.default',
                           border: 
                             ansIndex === answer.correctAnswer ? '1px solid #4caf50' :
                             ansIndex === answer.selectedAnswer ? '1px solid #f44336' : '1px solid #e0e0e0'
@@ -279,8 +279,8 @@ const Result = () => {
                           fontWeight: 'bold', 
                           mr: 1,
                           color: 
-                            ansIndex === answer.correctAnswer ? '#2e7d32' :
-                            ansIndex === answer.selectedAnswer ? '#d32f2f' : 'inherit'
+                            ansIndex === answer.correctAnswer ? 'success.dark' :
+                            ansIndex === answer.selectedAnswer ? 'error.dark' : 'inherit'
                         }}>
                           {String.fromCharCode(65 + ansIndex)}.
                         </Typography>
@@ -312,7 +312,7 @@ const Result = () => {
                     <Box sx={{ 
                       mt: 2, 
                       p: 2, 
-                      backgroundColor: '#f5f5f5', 
+                      backgroundColor: 'background.default', 
                       borderRadius: 1,
                       borderLeft: '4px solid #2196f3'
                     }}>
@@ -339,8 +339,8 @@ const Result = () => {
           startIcon={<Refresh />}
           onClick={() => navigate('/exam')}
           sx={{ 
-            backgroundColor: '#2196f3',
-            '&:hover': { backgroundColor: '#1976d2' }
+            backgroundColor: 'primary.main',
+            '&:hover': { backgroundColor: 'primary.dark' }
           }}
         >
           Thi lại

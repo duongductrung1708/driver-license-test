@@ -33,16 +33,20 @@ const Timer = ({ duration, onTimeUp, isRunning = true }) => {
   const isCritical = timeLeft <= 60; // Cảnh báo khi còn 1 phút
 
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: 2, 
-      p: 2, 
-      backgroundColor: isCritical ? '#ffebee' : isWarning ? '#fff3e0' : '#f5f5f5',
-      borderRadius: 2,
-      border: isCritical ? '2px solid #f44336' : isWarning ? '2px solid #ff9800' : '1px solid #e0e0e0'
-    }}>
+    <Box 
+      className={`slide-in-right ${isCritical ? 'shake-animation' : ''}`}
+      sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: 2, 
+        p: 2, 
+        backgroundColor: isCritical ? '#ffebee' : isWarning ? '#fff3e0' : '#f5f5f5',
+        borderRadius: 2,
+        border: isCritical ? '2px solid #f44336' : isWarning ? '2px solid #ff9800' : '1px solid #e0e0e0'
+      }}
+    >
       <AccessTime 
+        className={isCritical ? 'pulse-animation' : ''}
         sx={{ 
           color: isCritical ? '#f44336' : isWarning ? '#ff9800' : '#666',
           fontSize: 24 

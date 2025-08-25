@@ -56,7 +56,7 @@ const QuizQuestion = ({
   };
 
   return (
-    <Card sx={{ mb: 3, maxWidth: '100%' }}>
+    <Card className="slide-in-left" sx={{ mb: 3, maxWidth: '100%' }}>
       <CardContent>
         {/* Header với ID câu hỏi và badge điểm liệt */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
