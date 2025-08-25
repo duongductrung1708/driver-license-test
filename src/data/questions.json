@@ -1468,5 +1468,218 @@
     "correctAnswer": 1,
     "isDiemLiet": false,
     "explanation": "Hướng mũi tên đỏ xe đang di chuyển, không có mũi tên đỏ là đang dừng. Xe con trên làn rẽ phải có tín hiệu đèn đỏ nhưng rẽ phải sai. Xe tải trên làn đi thẳng có tín hiệu đèn đỏ - đi thẳng sai. Xe khách trên làn rẽ trái có tín hiệu đèn xanh- rẽ trái đúng. Xe mô tô trên làn rẽ trái có tín hiệu đèn xanh – rẽ trái đúng."
+  },
+  {
+    "id": 134,
+    "question": "Người điều khiển phương tiện tham gia giao thông đường bộ được hiểu như thế nào là đúng?",
+    "answers": ["Là người điều khiển xe cơ giới, người điều khiển xe thô sơ, người điều khiển xe máy chuyên dùng", "Là người được giao nhiệm vụ hướng dẫn giao thông trên đường bộ", "Cả hai ý trên"],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Nếu hỏi người điều khiển phương tiện → chọn nhóm người trực tiếp cầm lái."
+  },
+  {
+    "id": 135,
+    "question": "Tổ chức đua xe được phép thực hiện khi nào?",
+    "answers": ["Trên đường phố không có người qua lại", "Được người dân ủng hộ", "Được cơ quan có thẩm quyền cấp phép"],
+    "correctAnswer": 2,
+    "isDiemLiet": false,
+    "explanation": "Đua xe phải được cấp phép – Không tự ý dù vắng người hay được ủng hộ."
+  },
+  {
+    "id": 136,
+    "question": "Có bao nhiêu nhóm biển báo hiệu đường bộ?",
+    "answers": ["Ba nhóm: Biển báo cấm, biển báo nguy hiểm và biển hiệu lệnh", "Bốn nhóm: Biển báo cấm, biển báo nguy hiểm, biển hiệu lệnh và biển phụ", "Năm nhóm: Biển báo cấm, biển báo nguy hiểm, biển hiệu lệnh, biển chỉ dẫn, biển phụ"],
+    "correctAnswer": 2,
+    "isDiemLiet": false,
+    "explanation": "Có 5 nhóm biển báo."
+  },
+  {
+    "id": 137,
+    "question": "Trên một chiều đường có vạch kẻ phân làn đường, người lái xe cơ giới, xe máy chuyên dùng phải điều khiển xe đi trên làn đường nào?",
+    "answers": ["Đi trên làn đường bên phải trong cùng", "Đi trên làn đường bên trái", "Đi ở bất cứ làn nào nhưng phải bảo đảm tốc độ cho phép"],
+    "correctAnswer": 1,
+    "isDiemLiet": false,
+    "explanation": "Xe thô sơ đi làm bên phải trong cùng, xe cơ giới đi làn bên trái."
+  },
+  {
+    "id": 138,
+    "question": "Trước khi cho xe chuyển hướng, người lái xe phải làm gì để bảo đảm an toàn giao thông?",
+    "answers": ["Phải quan sát, bảo đảm khoảng cách an toàn với xe phía sau", "Giảm tốc độ và có tín hiệu báo hướng rẽ", "Chuyển dần sang làn gần nhất với hướng rẽ. Khi bảo đảm an toàn, không gây trở ngại cho người và phương tiện khác mới được chuyển hướng", "Cả ba ý trên"],
+    "correctAnswer": 3,
+    "isDiemLiet": false,
+    "explanation": "Quan sát trước – Báo hiệu sau – Đi đúng làn ➡ Ba bước chuẩn: Nhìn – Xi nhan – Lấn đúng làn → mới được rẽ."
+  },
+  {
+    "id": 139,
+    "question": "Người lái xe mô tô hai bánh, xe mô tô ba bánh, xe gắn máy không được thực hiện các hành vi nào dưới đây?",
+    "answers": ["Đi xe dàn hàng ngang; buông cả hai tay", "Sử dụng xe để kéo, đẩy xe khác, vật khác, dẫn dắt vật nuôi, mang, vác và chở vật cồng kềnh; chở người đứng trên xe, giá đèo hàng hoặc ngồi trên tay lái; xếp hàng hóa trên xe quá giới hạn quy định", "Ngồi về một bên điều khiển xe; đứng, nằm trên xe điều khiển xe; thay người lái xe khi xe đang chạy; quay người về phía sau để điều khiển xe hoặc bịt mắt điều khiển xe; sử dụng chân chống hoặc vật khác quệt xuống đường khi xe đang chạy", "Cả ba ý trên"],
+    "correctAnswer": 3,
+    "isDiemLiet": true,
+    "explanation": "👉 Dàn hàng – Kéo đẩy – Diễn xiếc ➡ Hành vi nào gây nguy hiểm, mất kiểm soát, cản trở giao thông."
+  },
+  {
+    "id": 140,
+    "question": "Trên đường không phân chia thành hai chiều xe chạy riêng biệt, người điều khiển phương tiện tham gia giao thông đường bộ phải tránh xe đi ngược chiều như thế nào để bảo đảm an toàn?",
+    "answers": ["Giảm tốc độ và cho xe đi về bên phải theo chiều xe chạy của mình", "Một trong hai xe phải dừng lại cho xe kia đi qua mới được đi", "Tăng tốc độ, cho xe đi về bên phải theo chiều xe chạy của mình để nhanh chóng vượt qua"],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Nguyên tắc vàng: Giảm tốc độ + Đi về bên phải khi gặp xe đi ngược chiều."
+  },
+  {
+    "id": 141,
+    "question": "Khi tới đường ngang không có người gác, chắn đường bộ, chuông, đèn tín hiệu, người tham gia giao thông đường bộ phải làm gì để bảo đảm an toàn?",
+    "answers": ["Dừng lại về bên phải đường của mình, trước vạch dừng xe và quan sát hai phía, khi không có phương tiện giao thông đường sắt tới mới được đi qua", "Quan sát hai phía, khi không có phương tiện giao thông đường sắt tới thì nhanh chóng đi qua", "Dừng lại khoảng cách tối thiểu 3 mét tính từ ray đường sắt gần nhất, khi không có phương tiện giao thông đường sắt tới thì nhanh chóng đi qua"],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Không rào chắn – Dừng bên phải – Quan sát kỹ – Tàu không đến – Mới được qua. Cứ đến đường sắt không chắn thì luôn dừng lại, quan sát, và chỉ qua khi an toàn tuyệt đối."
+  },
+  {
+    "id": 142,
+    "question": "Người có Giấy phép lái xe mô tô hạng A1 không được phép điều khiển loại xe nào dưới đây?",
+    "answers": ["Xe mô tô hai bánh có dung tích xi-lanh 125 cm3 hoặc có công suất động cơ điện đến 11 kW", "Xe mô tô ba bánh", "Cả hai ý trên"],
+    "correctAnswer": 1,
+    "isDiemLiet": false,
+    "explanation": "Hạng A1: điều khiển xe moto 2 bánh có dung tích từ 125cc và động cơ điện 11kw"
+  },
+  {
+    "id": 143,
+    "question": "Trên đường bộ ngoài khu vực đông dân cư, đường đôi hoặc đường một chiều có từ hai làn xe cơ giới trở lên (trừ đường cao tốc) loại xe nào dưới đây được tham gia giao thông với tốc độ khai thác tối đa cho phép là 70 km/h?",
+    "answers": ["Xe ô tô chở người đến 28 chỗ không kể chỗ của người lái xe (trừ xe buýt); ô tô tải có trọng tải không lớn hơn 3,5 tấn", "Xe ô tô chở người trên 28 chỗ không kể chỗ người lái xe (trừ xe buýt); ô tô tải có trọng tải trên 3,5 tấn (trừ ô tô xi téc)", "Xe buýt; ô tô đầu kéo kéo sơ mi rơ moóc (trừ ô tô đầu kéo kéo sơ mi rơ moóc xi téc); xe mô tô; ô tô chuyên dùng (trừ ô tô trộn vữa, ô tô trộn bê tông lưu động)", "Ô tô kéo rơ moóc; ô tô kéo xe khác; ô tô trộn vữa, ô tô trộn bê tông lưu động, ô tô xi téc, ô tô đầu kéo kéo sơ mi rơ moóc xi téc, ô tô kéo theo rơ moóc xi téc"],
+    "correctAnswer": 2,
+    "isDiemLiet": false,
+    "explanation": "Ngoài khu vực dân cư xe mô tô chạy được: Đường 2 làn đường: 70km/h .Đường 1 làn đường: 60km/h. Mẹo nhỏ: bạn đang thi bằng mô tô thấy đáp án có mô tô thì chọn nhé!"
+  },
+  {
+    "id": 144,
+    "question": "Trong các hành vi dưới đây, người lái xe có văn hóa giao thông phải ứng xử như thế nào?",
+    "answers": ["Điều khiển xe đi bên phải theo chiều đi của mình; đi đúng phần đường, làn đường quy định; dừng, đỗ xe đúng nơi quy định; đã uống rượu, bia thì không lái xe", "Điều khiển xe đi trên phần đường, làn đường có ít phương tiện giao thông; dừng xe, đỗ xe ở nơi thuận tiện hoặc theo yêu cầu của hành khách, của người thân", "Dừng và đỗ xe ở nơi thuận tiện cho việc chuyên chở hành khách và giao nhận hàng hóa; sử dụng ít rượu, bia thì có thể lái xe"],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Đã uống rượu bia, thì không được lái xe."
+  },
+  {
+    "id": 145,
+    "question": "Khi tầm nhìn bị hạn chế bởi sương mù hoặc mưa to, người lái xe phải thực hiện các thao tác nào để bảo đảm an toàn?",
+    "answers": ["Tăng tốc độ, chạy gần xe trước, nhìn đèn hậu để định hướng", "Giảm tốc độ, chạy cách xa xe trước với khoảng cách an toàn, bật đèn sương mù và đèn chiếu gần", "Tăng tốc độ, bật đèn pha vượt qua xe chạy trước"],
+    "correctAnswer": 1,
+    "isDiemLiet": false,
+    "explanation": "Khi tầm nhìn hạn chế thì phải giảm tốc độ."
+  },
+  {
+    "id": 146,
+    "question": "Biển nào cấm máy kéo?",
+    "image": "/images/57.jpg",
+    "answers": ["Biển 1", "Biển 2 và biển 3", "Biển 1 và biển 3", "Cả ba biển"],
+    "correctAnswer": 1,
+    "isDiemLiet": false,
+    "explanation": "Cấm nhỏ cấm luôn lớn theo thứ tự: xe con – xe khách - xe tải - xe máy kéo - xe kéo kéo rơ móc. Nên cấm tải cấm luôn máy kéo chọn cả 2 và 3."
+  },
+  {
+    "id": 147,
+    "question": "Biển nào xe được phép rẽ trái?",
+    "image": "/images/58.jpg",
+    "answers": ["Biển 1", "Biển 2", "Không biển nào"],
+    "correctAnswer": 1,
+    "isDiemLiet": false,
+    "explanation": "Biển 1: cấm rẽ trái. Biển 2: Khu vực được phép quay đầu xe, rẽ trái được."
+  },
+  {
+    "id": 148,
+    "question": "Biển phụ đặt dưới biển cấm bóp còi có ý nghĩa như thế nào?",
+    "image": "/images/59.jpg",
+    "answers": ["Báo khoảng cách đến nơi cấm bóp còi", "Chiều dài đoạn đường cấm bóp còi từ nơi đặt biển", "Báo cấm dùng còi có độ vang xa 500m"],
+    "correctAnswer": 1,
+    "isDiemLiet": false,
+    "explanation": "Biển phụ báo hiệu chiều dài đoạn đường cấp bóp còi."
+  },
+  {
+    "id": 149,
+    "question": "Gặp biển nào người lái xe phải nhường đường cho người đi bộ?",
+    "image": "/images/60.jpg",
+    "answers": ["Biển 1", "Biển 2", "Biển 3"],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Biển 1: Nhường đường cho người đi bộ - Biển 2: Cấm người đi bộ - Biển 3: Dành cho người đi bộ."
+  },
+  {
+    "id": 150,
+    "question": "Hai biển này có ý nghĩa như thế nào?",
+    "image": "/images/23.jpg",
+    "answers": ["Để chỉ nơi đường sắt giao vuông góc với đường bộ không có rào chắn", "Để báo trước sắp đến vị trí giao cắt đường bộ với đường sắt cùng mức, không vuông góc và không có người gác, không có rào chắn", "Nơi đường sắt giao nhau với đường bộ"],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Biển 1: cấm rẽ trái. Biển 2: Khu vực được phép quay đầu xe, rẽ trái được."
+  },
+  {
+    "id": 151,
+    "question": "Biển nào báo hiệu 'Kết thúc đường đôi'?",
+    "image": "/images/61.jpg",
+    "answers": ["Biển 1", "Biển 2", "Biển 3"],
+    "correctAnswer": 2,
+    "isDiemLiet": false,
+    "explanation": "Biển 1: đường 2 chiều - Biển 2: đường đôi - Biển 3: kết thúc đường đôi."
+  },
+  {
+    "id": 152,
+    "question": "Biển báo này có ý nghĩa như thế nào?",
+    "image": "/images/62.jpg",
+    "answers": ["Báo hiệu đường có ổ gà, lồi lõm", "Báo hiệu đường có gồ giảm tốc phía trước"],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Biển báo hiệu đường ổ gà, lồi lõm ( 1 là gồ, 2 là ổ gà)."
+  },
+  {
+    "id": 153,
+    "question": "Biển nào dưới đây báo hiệu hết cấm vượt?",
+    "image": "/images/63.jpg",
+    "answers": ["Biển 1", "Biển 2", "Biển 3", "Biển 2 và biển 3"],
+    "correctAnswer": 3,
+    "isDiemLiet": false,
+    "explanation": "Biển 1: Hết tốc độ tối đa - Biển 2: Hết mọi lệnh cấm - Biển 3: Hết cấm vượt."
+  },
+  {
+    "id": 154,
+    "question": "Gặp biển báo dưới đây, người lái xe có bắt buộc phải chạy vòng theo đảo an toàn theo hướng mũi tên khi muốn chuyển hướng hay không?",
+    "image": "/images/64.jpg",
+    "answers": ["Bắt buộc", "Không bắt buộc"],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Biển báo dạng hình tròn, nền xanh là biển báo hiệu lệnh bắt buộc phải tuân thủ theo!"
+  },
+  {
+    "id": 155,
+    "question": "Theo hướng mũi tên, xe nào chấp hành đúng quy tắc giao thông?",
+    "image": "/images/65.jpg",
+    "answers": ["Xe khách, xe tải, xe mô tô", "Xe tải, xe mô tô", "Chỉ xe con", "Cả bốn xe"],
+    "correctAnswer": 2,
+    "isDiemLiet": false,
+    "explanation": "Hướng mũi tên đỏ xe đang di chuyển, không có mũi tên đỏ là đang dừng. Xe con trên làn rẽ phải có tín hiệu đèn xanh - rẽ phải đúng. Xe tải trên làn đi thẳng có tín hiệu đèn đỏ dừng lại rẽ trái sai. Xe tải trên làn rẽ phải có tín hiệu đèn xanh nhưng rẽ trái sai. Xe khách trên làn rẽ trái có tín hiệu đèn xanh nhưng đi thẳng sai. Xe mô tô trên làn rẽ trái có tín hiệu đèn xanh nhưng rẽ phải sai. Nên chỉ có xe con đúng"
+  },
+  {
+    "id": 156,
+    "question": "Theo hướng mũi tên, những hướng nào xe gắn máy được phép đi?",
+    "image": "/images/66.jpg",
+    "answers": ["Cả ba hướng", "Chỉ hướng 1 và 3", "Chỉ hướng 1"],
+    "correctAnswer": 0,
+    "isDiemLiet": false,
+    "explanation": "Biển hướng 2 cấm xe mô tô không cấm gắn máy nên gắn máy đi cả 3 hướng. Hỏi moto chọn 2 hướng, hỏi gắn máy chọn 3 hướng"
+  },
+  {
+    "id": 157,
+    "question": "Theo hướng mũi tên, những hướng nào xe mô tô được phép đi?",
+    "image": "/images/67.jpg",
+    "answers": ["Cả ba hướng", "Hướng 1 và 2", "Hướng 1 và 3", "Hướng 2 và 3"],
+    "correctAnswer": 2,
+    "isDiemLiet": false,
+    "explanation": "Hỏi moto chọn 2 hướng, hỏi gắn máy chọn 3 hướng."
+  },
+  {
+    "id": 158,
+    "question": "Các xe đi theo thứ tự nào là đúng quy tắc giao thông đường bộ?",
+    "image": "/images/68.jpg",
+    "answers": ["Xe của bạn, xe mô tô, xe con", "Xe con, xe của bạn, xe mô tô", "Xe mô tô, xe con, xe của bạn"],
+    "correctAnswer": 2,
+    "isDiemLiet": false,
+    "explanation": "Phía trước có biển báo giao nhau với đường ưu tiên (tam giác ngược) vì thế bạn phải nhường đường và đi sau cùng. Chọn đáp án số 3."
   }
 ]
