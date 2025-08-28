@@ -49,12 +49,28 @@ const Practice = () => {
     
     // Apply practice mode filter first
     if (practiceMode === 'random') {
-      // For random mode, select 25 random questions
-      const shuffled = [...questionsData].sort(() => 0.5 - Math.random());
-      filtered = shuffled.slice(0, 25);
+      // For random mode, select 25 random questions with exactly 2 diem liet
+      const DIEM_LIET_NEEDED = 2;
+      const TOTAL = 25;
+      const diemLiet = questionsData.filter(q => q.isDiemLiet);
+      const nonDiemLiet = questionsData.filter(q => !q.isDiemLiet);
+
+      const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+
+      const pick = (arr, n) => shuffle(arr).slice(0, Math.min(n, arr.length));
+
+      const selectedDiemLiet = pick(diemLiet, DIEM_LIET_NEEDED);
+      const remaining = TOTAL - selectedDiemLiet.length;
+      const selectedNonDiemLiet = pick(nonDiemLiet, remaining);
+      filtered = shuffle([...selectedDiemLiet, ...selectedNonDiemLiet]);
     } else if (practiceMode === 'diemLiet') {
       // For diemLiet mode, select only diemLiet questions
       filtered = questionsData.filter(q => q.isDiemLiet);
+    } else if (practiceMode === 'wrong') {
+      // Practice only wrong questions stored in localStorage
+      const savedWrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
+      const wrongQuestionIds = savedWrongAnswers.map(w => w.questionId);
+      filtered = questionsData.filter(q => wrongQuestionIds.includes(q.id));
     }
     
     // Then apply additional filters
@@ -168,7 +184,8 @@ const Practice = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
           {practiceMode === 'random' ? 'Ôn tập 25 câu' : 
-           practiceMode === 'diemLiet' ? 'Học câu điểm liệt' : 'Ôn tập full'}
+           practiceMode === 'diemLiet' ? 'Học câu điểm liệt' : 
+           practiceMode === 'wrong' ? 'Ôn tập các câu đã sai' : 'Ôn tập full'}
         </Typography>
         <Button 
           variant="outlined" 
@@ -187,8 +204,9 @@ const Practice = () => {
               ? 'Chế độ ôn tập với 25 câu hỏi ngẫu nhiên từ bộ đề'
               : practiceMode === 'diemLiet'
               ? 'Chế độ học 20 câu điểm liệt quan trọng'
-              : 'Chế độ ôn tập toàn bộ 250 câu hỏi'
-            }
+              : practiceMode === 'wrong'
+              ? 'Luyện tập lại các câu bạn đã làm sai trước đó'
+              : 'Chế độ ôn tập toàn bộ 250 câu hỏi'}
           </Typography>
           <Box sx={{ display: 'flex', gap: 1 }}>
             {practiceMode !== 'diemLiet' && (
@@ -202,6 +220,13 @@ const Practice = () => {
                 Chuyển sang {practiceMode === 'random' ? 'Ôn tập full' : 'Ôn tập 25 câu'}
               </Button>
             )}
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => navigate('/practice', { state: { mode: 'wrong' } })}
+            >
+              Học các câu đã sai
+            </Button>
             <Button
               variant="outlined"
               size="small"

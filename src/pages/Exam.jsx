@@ -34,13 +34,40 @@ const Exam = () => {
   const [wrongAnswers, setWrongAnswers] = useState([]);
   const [hasDiemLietWrong, setHasDiemLietWrong] = useState(false);
 
-  const EXAM_DURATION = 19 * 60; // 19 minutes in seconds
-  const TOTAL_QUESTIONS = 25;
+  // Support multiple exam modes via location.state
+  const urlParamsMode = typeof window !== 'undefined' && window.history?.state?.usr?.mode;
+  const isFullExam = urlParamsMode === 'full';
+  const isWrongExam = urlParamsMode === 'wrong';
+  const isSpeedExam = urlParamsMode === 'speed';
+
+  const EXAM_DURATION = isFullExam ? 190 * 60 : isSpeedExam ? 5 * 60 : 19 * 60; // seconds
+  const TOTAL_QUESTIONS = isFullExam ? questionsData.length : 25;
 
   // Generate random exam questions
   const generateExamQuestions = () => {
-    const shuffled = [...questionsData].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, TOTAL_QUESTIONS);
+    const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+    const pick = (arr, n) => shuffle(arr).slice(0, Math.min(n, arr.length));
+
+    // Wrong-only exam
+    if (isWrongExam) {
+      const savedWrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
+      const wrongIds = savedWrongAnswers.map(w => w.questionId);
+      const wrongQs = questionsData.filter(q => wrongIds.includes(q.id));
+      return shuffle(wrongQs).slice(0, TOTAL_QUESTIONS);
+    }
+
+    // Full exam: all questions shuffled
+    if (isFullExam) {
+      return shuffle([...questionsData]).slice(0, TOTAL_QUESTIONS);
+    }
+
+    // Default (25-question exams): ensure 2 diem liet
+    const DIEM_LIET_NEEDED = 2;
+    const diemLiet = questionsData.filter(q => q.isDiemLiet);
+    const nonDiemLiet = questionsData.filter(q => !q.isDiemLiet);
+    const selectedDiemLiet = pick(diemLiet, DIEM_LIET_NEEDED);
+    const selectedNonDiemLiet = pick(nonDiemLiet, TOTAL_QUESTIONS - selectedDiemLiet.length);
+    return shuffle([...selectedDiemLiet, ...selectedNonDiemLiet]);
   };
 
   const startExam = () => {
@@ -194,7 +221,7 @@ const Exam = () => {
 
         <Paper sx={{ p: 4, textAlign: 'center' }}>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
-            Bài thi thử bằng lái xe A1
+            {isFullExam ? 'Thi full bộ đề' : isWrongExam ? 'Thi các câu đã sai' : isSpeedExam ? 'Thi tốc độ 25 câu' : 'Bài thi thử bằng lái xe A1'}
           </Typography>
           
           <Box sx={{ my: 4 }}>
@@ -202,7 +229,7 @@ const Exam = () => {
               • Số câu hỏi: <strong>{TOTAL_QUESTIONS} câu</strong>
             </Typography>
             <Typography variant="body1" sx={{ mb: 2 }}>
-              • Thời gian: <strong>19 phút</strong>
+              • Thời gian: <strong>{isFullExam ? '190 phút' : isSpeedExam ? '5 phút' : '19 phút'}</strong>
             </Typography>
             <Typography variant="body1" sx={{ mb: 2 }}>
               • Điểm đạt: <strong>≥ 21 câu đúng</strong>

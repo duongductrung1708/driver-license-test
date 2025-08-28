@@ -68,24 +68,56 @@ const Home = () => {
       title: "Ôn tập 25 câu",
       description: "Ôn tập với 25 câu hỏi ngẫu nhiên",
       action: () => navigate("/practice", { state: { mode: "random" } }),
+      buttonColor: 'primary',
     },
     {
       icon: <School sx={{ fontSize: 40, color: "warning.main" }} />,
       title: "Ôn tập toàn bộ",
       description: "Ôn tập toàn bộ 250 câu hỏi",
       action: () => navigate("/practice", { state: { mode: "full" } }),
+      buttonColor: 'warning',
+    },
+    {
+      icon: <History sx={{ fontSize: 40, color: "secondary.main" }} />,
+      title: "Ôn tập các câu sai",
+      description: "Luyện tập lại những câu bạn đã làm sai",
+      action: () => navigate("/practice", { state: { mode: "wrong" } }),
+      buttonColor: 'secondary',
     },
     {
       icon: <Warning sx={{ fontSize: 40, color: "error.main" }} />,
       title: "Học câu điểm liệt",
       description: "Ôn tập 20 câu điểm liệt quan trọng",
       action: () => navigate("/practice", { state: { mode: "diemLiet" } }),
+      buttonColor: 'error',
     },
     {
       icon: <Quiz sx={{ fontSize: 40, color: "success.main" }} />,
       title: "Thi thử",
       description: "Làm bài thi 25 câu trong 19 phút",
       action: () => navigate("/exam"),
+      buttonColor: 'success',
+    },
+    {
+      icon: <Quiz sx={{ fontSize: 40, color: "info.main" }} />,
+      title: "Thi full bộ đề",
+      description: "Thi toàn bộ câu hỏi trong 190 phút",
+      action: () => navigate("/exam", { state: { mode: "full" } }),
+      buttonColor: 'info',
+    },
+    {
+      icon: <Quiz sx={{ fontSize: 40, color: "secondary.main" }} />,
+      title: "Thi các câu đã sai",
+      description: "Thi lại dựa trên danh sách câu sai",
+      action: () => navigate("/exam", { state: { mode: "wrong" } }),
+      buttonColor: 'secondary',
+    },
+    {
+      icon: <Speed sx={{ fontSize: 40, color: "warning.main" }} />,
+      title: "Thi tốc độ 5 phút",
+      description: "25 câu trong 5 phút (tốc độ)",
+      action: () => navigate("/exam", { state: { mode: "speed" } }),
+      buttonColor: 'warning',
     },
   ];
 
@@ -218,23 +250,9 @@ const Home = () => {
                   onClick={feature.action}
                   sx={{
                     minWidth: 120,
-                    backgroundColor:
-                      index === 0
-                        ? "primary.main"
-                        : index === 1
-                        ? "warning.main"
-                        : index === 2
-                        ? "error.main"
-                        : "success.main",
+                    backgroundColor: `${feature.buttonColor}.main`,
                     "&:hover": {
-                      backgroundColor:
-                        index === 0
-                          ? "primary.dark"
-                          : index === 1
-                          ? "warning.dark"
-                          : index === 2
-                          ? "error.dark"
-                          : "success.dark",
+                      backgroundColor: `${feature.buttonColor}.dark`,
                     },
                   }}
                 >
