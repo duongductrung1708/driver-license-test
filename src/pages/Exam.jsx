@@ -22,6 +22,7 @@ import QuizQuestion from '../components/QuizQuestion';
 import ProgressBar from '../components/ProgressBar';
 import Timer from '../components/Timer';
 import questionsData from '../data/questions.json';
+import { evaluateAndUnlockAchievements } from '../components/achievements';
 
 const Exam = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const Exam = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [wrongAnswers, setWrongAnswers] = useState([]);
   const [hasDiemLietWrong, setHasDiemLietWrong] = useState(false);
+  const [examStartTime, setExamStartTime] = useState(null);
 
   // Support multiple exam modes via location.state
   const urlParamsMode = typeof window !== 'undefined' && window.history?.state?.usr?.mode;
@@ -78,6 +80,7 @@ const Exam = () => {
     setCurrentQuestionIndex(0);
     setIsExamFinished(false);
     setHasDiemLietWrong(false);
+    setExamStartTime(new Date());
   };
 
   const handleAnswerSelect = (answerIndex) => {
@@ -178,6 +181,25 @@ const Exam = () => {
     const updatedHistory = [examResult, ...existingHistory];
     localStorage.setItem('examHistory', JSON.stringify(updatedHistory));
 
+    // Compute duration & mode for achievements
+    const finishedAt = new Date();
+    const durationSeconds = examStartTime ? Math.max(0, Math.floor((finishedAt - examStartTime) / 1000)) : undefined;
+    const mode = isFullExam ? 'full' : isWrongExam ? 'wrong' : isSpeedExam ? 'speed' : 'default';
+
+    // Evaluate and unlock achievements
+    const unlocked = evaluateAndUnlockAchievements({
+      isPassed,
+      score: Math.round((correctCount / TOTAL_QUESTIONS) * 100),
+      totalQuestions: TOTAL_QUESTIONS,
+      wrongAnswers: wrongAnswersList,
+      allAnswers: allAnswersList,
+      mode,
+      durationSeconds,
+      finishedAtISOString: finishedAt.toISOString(),
+      hasDiemLietWrong: diemLietWrongCount > 0,
+      diemLietWrongCount
+    });
+
     // Navigate to result page with data
     navigate('/result', {
       state: {
@@ -189,7 +211,8 @@ const Exam = () => {
         allAnswers: allAnswersList,
         isPassed,
         hasDiemLietWrong: diemLietWrongCount > 0,
-        diemLietWrongCount
+        diemLietWrongCount,
+        newlyUnlockedAchievements: unlocked
       }
     });
   };

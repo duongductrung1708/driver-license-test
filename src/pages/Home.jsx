@@ -11,6 +11,7 @@ import {
   Chip,
   Alert,
 } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
 import {
   School,
   Quiz,
@@ -23,16 +24,21 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import questionsData from "../data/questions.json";
+import { ACHIEVEMENT_META, getUnlockedAchievements, getCurrentStreak } from "../components/achievements";
 
 const Home = () => {
   const navigate = useNavigate();
   const [examHistory, setExamHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [unlockedAchievements, setUnlockedAchievements] = useState([]);
+  const [streakCount, setStreakCount] = useState(0);
 
   // Load exam history from localStorage
   useEffect(() => {
     const history = JSON.parse(localStorage.getItem("examHistory") || "[]");
     setExamHistory(history);
+    setUnlockedAchievements(getUnlockedAchievements());
+    setStreakCount(getCurrentStreak());
   }, []);
 
   const formatDate = (dateString) => {
@@ -180,6 +186,71 @@ const Home = () => {
             </Grid>
           ))}
         </Grid>
+      </Paper>
+
+      {/* Thành tích & Huy hiệu */}
+      <Paper sx={{ p: 3, mb: 4, backgroundColor: "background.default" }}>
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{ fontWeight: "bold", mb: 2 }}
+        >
+          Thành tích & Huy hiệu 🏆
+        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+          <Chip label={`Chuỗi ngày liên tiếp: ${streakCount}`} color={streakCount >= 1 ? "primary" : "default"} />
+        </Box>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'repeat(4, 1fr)',
+              sm: 'repeat(6, 1fr)',
+              md: 'repeat(8, 1fr)',
+              lg: 'repeat(10, 1fr)'
+            },
+            gap: 2,
+            alignItems: 'center',
+            justifyItems: 'center'
+          }}
+        >
+          {Object.keys(ACHIEVEMENT_META).map((id) => {
+            const meta = ACHIEVEMENT_META[id];
+            const isUnlocked = unlockedAchievements.includes(id);
+            return (
+              <Tooltip 
+                key={id}
+                title={
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{meta.title}</Typography>
+                    <Typography variant="caption" color="text.secondary">{meta.description}</Typography>
+                  </Box>
+                }
+                arrow
+              >
+                <Box
+                  sx={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '1px solid',
+                    borderColor: isUnlocked ? 'primary.main' : 'divider',
+                    color: isUnlocked ? 'primary.main' : 'text.disabled',
+                    backgroundColor: isUnlocked ? 'action.hover' : 'background.paper',
+                    transition: 'transform 0.2s ease',
+                    cursor: 'default',
+                    '&:hover': { transform: 'translateY(-2px)' }
+                  }}
+                >
+                  <Typography component="span" sx={{ fontSize: 28, lineHeight: 1 }}>{meta.icon}</Typography>
+                </Box>
+              </Tooltip>
+            );
+          })}
+        </Box>
       </Paper>
 
       {/* Các chế độ học */}
