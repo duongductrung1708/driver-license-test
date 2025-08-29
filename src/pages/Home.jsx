@@ -25,6 +25,10 @@ import {
 import { useNavigate } from "react-router-dom";
 import questionsData from "../data/questions.json";
 import { ACHIEVEMENT_META, getUnlockedAchievements, getCurrentStreak } from "../components/achievements";
+import SearchQuestions from "../components/SearchQuestions";
+import ExamGoalSetter from "../components/ExamGoalSetter";
+import AchievementNotification from "../components/AchievementNotification";
+import SoundControl from "../components/SoundControl";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -32,6 +36,7 @@ const Home = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [unlockedAchievements, setUnlockedAchievements] = useState([]);
   const [streakCount, setStreakCount] = useState(0);
+  const [newAchievement, setNewAchievement] = useState(null);
 
   // Load exam history from localStorage
   useEffect(() => {
@@ -40,6 +45,27 @@ const Home = () => {
     setUnlockedAchievements(getUnlockedAchievements());
     setStreakCount(getCurrentStreak());
   }, []);
+
+  // Check for new achievements from exam history
+  useEffect(() => {
+    if (examHistory.length > 0) {
+      const latestExam = examHistory[0]; // Most recent exam
+      if (latestExam.newAchievements && latestExam.newAchievements.length > 0) {
+        // Show the first new achievement
+        setNewAchievement(latestExam.newAchievements[0]);
+        // Remove the newAchievements flag to prevent showing again
+        const updatedHistory = examHistory.map((exam, index) => 
+          index === 0 ? { ...exam, newAchievements: undefined } : exam
+        );
+        localStorage.setItem("examHistory", JSON.stringify(updatedHistory));
+        setExamHistory(updatedHistory);
+      }
+    }
+  }, [examHistory]);
+
+  const handleAchievementClose = () => {
+    setNewAchievement(null);
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -188,6 +214,9 @@ const Home = () => {
         </Grid>
       </Paper>
 
+      {/* Đặt mục tiêu ngày thi */}
+      <ExamGoalSetter />
+
       {/* Thành tích & Huy hiệu */}
       <Paper sx={{ p: 3, mb: 4, backgroundColor: "background.default" }}>
         <Typography
@@ -252,6 +281,9 @@ const Home = () => {
           })}
         </Box>
       </Paper>
+
+      {/* Tìm kiếm câu hỏi */}
+      <SearchQuestions />
 
       {/* Các chế độ học */}
       <Grid container spacing={4} alignItems="stretch" sx={{ mb: 6 }}>
@@ -555,6 +587,15 @@ const Home = () => {
           </>
         )}
       </Paper>
+
+      {/* Achievement Notification */}
+      {newAchievement && (
+        <AchievementNotification
+          achievementId={newAchievement}
+          onClose={handleAchievementClose}
+        />
+      )}
+      <SoundControl />
     </Container>
   );
 };

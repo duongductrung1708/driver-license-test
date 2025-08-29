@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   Container, 
   Typography, 
@@ -21,17 +21,21 @@ import {
   TrendingUp
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import useSound from '../hooks/useSound';
+import SoundControl from '../components/SoundControl';
 
 const Result = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const resultData = location.state;
+  const { playPass, playFail } = useSound();
 
-  // Redirect if no result data
-  if (!resultData) {
-    navigate('/');
-    return null;
-  }
+  // Redirect if no result data (use effect to avoid conditional hooks)
+  useEffect(() => {
+    if (!resultData) {
+      navigate('/');
+    }
+  }, [resultData, navigate]);
 
   const {
     totalQuestions,
@@ -46,6 +50,22 @@ const Result = () => {
   } = resultData;
 
   const score = Math.round((correctCount / totalQuestions) * 100);
+
+  useEffect(() => {
+    // play pass/fail on mount
+    if (isPassed) {
+      playPass();
+    } else {
+      playFail();
+    }
+    // run once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Guard render if no result data
+  if (!resultData) {
+    return null;
+  }
 
   const getScoreColor = () => {
     if (isPassed) return 'success.main';
@@ -364,6 +384,7 @@ const Result = () => {
           </Typography>
         </Alert>
       )}
+      <SoundControl />
     </Container>
   );
 };

@@ -123,60 +123,83 @@ export function getUnlockedAchievements() {
 export function evaluateAndUnlockAchievements(context) {
   // context: { isPassed, score, totalQuestions, wrongAnswers, allAnswers, mode, durationSeconds, finishedAtISOString, hasDiemLietWrong, diemLietWrongCount }
   const unlocked = new Set(getStoredAchievements());
+  const previouslyUnlocked = new Set(getStoredAchievements());
+  const newlyUnlocked = [];
 
   // Streaks (count per day regardless of pass/fail)
   const streak = updateStreakOnExamComplete(new Date(context.finishedAtISOString || Date.now()));
-  if (streak >= 3) unlocked.add(ACHIEVEMENTS.STREAK_3);
-  if (streak >= 7) unlocked.add(ACHIEVEMENTS.STREAK_7);
-  if (streak >= 30) unlocked.add(ACHIEVEMENTS.STREAK_30);
+  if (streak >= 3 && !unlocked.has(ACHIEVEMENTS.STREAK_3)) {
+    unlocked.add(ACHIEVEMENTS.STREAK_3);
+    newlyUnlocked.push(ACHIEVEMENTS.STREAK_3);
+  }
+  if (streak >= 7 && !unlocked.has(ACHIEVEMENTS.STREAK_7)) {
+    unlocked.add(ACHIEVEMENTS.STREAK_7);
+    newlyUnlocked.push(ACHIEVEMENTS.STREAK_7);
+  }
+  if (streak >= 30 && !unlocked.has(ACHIEVEMENTS.STREAK_30)) {
+    unlocked.add(ACHIEVEMENTS.STREAK_30);
+    newlyUnlocked.push(ACHIEVEMENTS.STREAK_30);
+  }
 
   if (context.isPassed) {
     // First pass: first time achieving a passed exam
     if (!unlocked.has(ACHIEVEMENTS.FIRST_PASS)) {
       unlocked.add(ACHIEVEMENTS.FIRST_PASS);
+      newlyUnlocked.push(ACHIEVEMENTS.FIRST_PASS);
     }
 
     // Perfect score
-    if (context.score === 100) {
+    if (context.score === 100 && !unlocked.has(ACHIEVEMENTS.PERFECT_SCORE)) {
       unlocked.add(ACHIEVEMENTS.PERFECT_SCORE);
+      newlyUnlocked.push(ACHIEVEMENTS.PERFECT_SCORE);
     }
 
     // Night owl: finish time between 00:00 and 04:00 local
     try {
       const finished = new Date(context.finishedAtISOString || Date.now());
       const hour = finished.getHours();
-      if (hour >= 0 && hour < 4) {
+      if (hour >= 0 && hour < 4 && !unlocked.has(ACHIEVEMENTS.NIGHT_OWL)) {
         unlocked.add(ACHIEVEMENTS.NIGHT_OWL);
+        newlyUnlocked.push(ACHIEVEMENTS.NIGHT_OWL);
       }
     } catch {}
 
     // Speed run: duration <= 5 minutes (applies to any mode completed within 5 minutes)
-    if (context.durationSeconds !== undefined && context.durationSeconds <= 5 * 60) {
+    if (context.durationSeconds !== undefined && context.durationSeconds <= 5 * 60 && !unlocked.has(ACHIEVEMENTS.SPEED_RUN)) {
       unlocked.add(ACHIEVEMENTS.SPEED_RUN);
+      newlyUnlocked.push(ACHIEVEMENTS.SPEED_RUN);
     }
 
     // Learn from mistakes: pass an exam in 'wrong' practice/exam mode
-    if (context.mode === 'wrong') {
+    if (context.mode === 'wrong' && !unlocked.has(ACHIEVEMENTS.LEARN_FROM_MISTAKES)) {
       unlocked.add(ACHIEVEMENTS.LEARN_FROM_MISTAKES);
+      newlyUnlocked.push(ACHIEVEMENTS.LEARN_FROM_MISTAKES);
     }
 
     // Diem liet master: pass without any diem liet wrong
-    if (!context.hasDiemLietWrong) {
+    if (!context.hasDiemLietWrong && !unlocked.has(ACHIEVEMENTS.DIEM_LIET_MASTER)) {
       unlocked.add(ACHIEVEMENTS.DIEM_LIET_MASTER);
+      newlyUnlocked.push(ACHIEVEMENTS.DIEM_LIET_MASTER);
     }
 
     // Sign master: in passed exam, 100% correct on questions that have images (proxy for biển báo)
     if (Array.isArray(context.allAnswers)) {
       const signAnswers = context.allAnswers.filter(a => !!a.image);
-      if (signAnswers.length > 0 && signAnswers.every(a => a.isCorrect)) {
+      if (signAnswers.length > 0 && signAnswers.every(a => a.isCorrect) && !unlocked.has(ACHIEVEMENTS.SIGN_MASTER)) {
         unlocked.add(ACHIEVEMENTS.SIGN_MASTER);
+        newlyUnlocked.push(ACHIEVEMENTS.SIGN_MASTER);
       }
     }
   }
 
   const list = Array.from(unlocked);
   storeAchievements(list);
-  return list;
+  
+  // Return both the full list and newly unlocked achievements
+  return {
+    allAchievements: list,
+    newlyUnlocked: newlyUnlocked
+  };
 }
 
 export function resetAchievements() {

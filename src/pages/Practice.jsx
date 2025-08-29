@@ -22,11 +22,15 @@ import QuizQuestion from '../components/QuizQuestion';
 import ProgressBar from '../components/ProgressBar';
 import DiemLietStats from '../components/DiemLietStats';
 import questionsData from '../data/questions.json';
+import useSound from '../hooks/useSound';
+import SoundControl from '../components/SoundControl';
 
 const Practice = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const practiceMode = location.state?.mode || 'full'; // Default to full mode
+  const customQuestionIds = location.state?.questionIds || [];
+  const searchTerm = location.state?.searchTerm || '';
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -34,6 +38,7 @@ const Practice = () => {
   const [filteredQuestions, setFilteredQuestions] = useState(questionsData);
   const [wrongAnswers, setWrongAnswers] = useState([]);
   const [answeredQuestions, setAnsweredQuestions] = useState({});
+  const { playCorrect, playIncorrect } = useSound();
 
   // Load wrong answers from localStorage
   useEffect(() => {
@@ -71,6 +76,9 @@ const Practice = () => {
       const savedWrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
       const wrongQuestionIds = savedWrongAnswers.map(w => w.questionId);
       filtered = questionsData.filter(q => wrongQuestionIds.includes(q.id));
+    } else if (practiceMode === 'custom') {
+      // Practice custom questions from search
+      filtered = questionsData.filter(q => customQuestionIds.includes(q.id));
     }
     
     // Then apply additional filters
@@ -107,7 +115,7 @@ const Practice = () => {
         setIsAnswered(false);
       }
     }
-  }, [wrongAnswers, filter, currentQuestionIndex]);
+  }, [wrongAnswers, filter, currentQuestionIndex, customQuestionIds]);
 
   const currentQuestion = filteredQuestions[currentQuestionIndex];
 
@@ -141,8 +149,16 @@ const Practice = () => {
       [currentQuestion.id]: true
     }));
     
+    const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
+    // sound feedback
+    if (isCorrect) {
+      playCorrect();
+    } else {
+      playIncorrect();
+    }
+
     // Save wrong answer to localStorage
-    if (selectedAnswer !== currentQuestion.correctAnswer) {
+    if (!isCorrect) {
       const newWrongAnswer = {
         questionId: currentQuestion.id,
         selectedAnswer: selectedAnswer,
@@ -185,7 +201,8 @@ const Practice = () => {
         <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
           {practiceMode === 'random' ? 'Ôn tập 25 câu' : 
            practiceMode === 'diemLiet' ? 'Học câu điểm liệt' : 
-           practiceMode === 'wrong' ? 'Ôn tập các câu đã sai' : 'Ôn tập full'}
+           practiceMode === 'wrong' ? 'Ôn tập các câu đã sai' : 
+           practiceMode === 'custom' ? `Ôn tập từ khóa: "${searchTerm}"` : 'Ôn tập full'}
         </Typography>
         <Button 
           variant="outlined" 
@@ -206,10 +223,12 @@ const Practice = () => {
               ? 'Chế độ học 20 câu điểm liệt quan trọng'
               : practiceMode === 'wrong'
               ? 'Luyện tập lại các câu bạn đã làm sai trước đó'
+              : practiceMode === 'custom'
+              ? `Ôn tập ${customQuestionIds.length} câu hỏi liên quan đến từ khóa: "${searchTerm}"`
               : 'Chế độ ôn tập toàn bộ 250 câu hỏi'}
           </Typography>
           <Box sx={{ display: 'flex', gap: 1 }}>
-            {practiceMode !== 'diemLiet' && (
+            {practiceMode !== 'diemLiet' && practiceMode !== 'custom' && (
               <Button
                 variant="outlined"
                 size="small"
@@ -220,23 +239,36 @@ const Practice = () => {
                 Chuyển sang {practiceMode === 'random' ? 'Ôn tập full' : 'Ôn tập 25 câu'}
               </Button>
             )}
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => navigate('/practice', { state: { mode: 'wrong' } })}
-            >
-              Học các câu đã sai
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              color="error"
-              onClick={() => navigate('/practice', { 
-                state: { mode: 'diemLiet' } 
-              })}
-            >
-              Học câu điểm liệt
-            </Button>
+            {practiceMode !== 'custom' && (
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => navigate('/practice', { state: { mode: 'wrong' } })}
+              >
+                Học các câu đã sai
+              </Button>
+            )}
+            {practiceMode !== 'custom' && (
+              <Button
+                variant="outlined"
+                size="small"
+                color="error"
+                onClick={() => navigate('/practice', { 
+                  state: { mode: 'diemLiet' } 
+                })}
+              >
+                Học câu điểm liệt
+              </Button>
+            )}
+            {practiceMode === 'custom' && (
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => navigate('/')}
+              >
+                Về trang tìm kiếm
+              </Button>
+            )}
           </Box>
         </Box>
       </Paper>
@@ -254,9 +286,10 @@ const Practice = () => {
             >
               <MenuItem value="all">
                 Tất cả câu hỏi ({practiceMode === 'random' ? '25 câu ngẫu nhiên' : 
-                                practiceMode === 'diemLiet' ? '20 câu điểm liệt' : questionsData.length})
+                                practiceMode === 'diemLiet' ? '20 câu điểm liệt' : 
+                                practiceMode === 'custom' ? `${customQuestionIds.length} câu tìm kiếm` : questionsData.length})
               </MenuItem>
-              {practiceMode !== 'diemLiet' && (
+              {practiceMode !== 'diemLiet' && practiceMode !== 'custom' && (
                 <MenuItem value="diemLiet">
                   Chỉ câu điểm liệt ({practiceMode === 'random' ? 'Trong 25 câu' : questionsData.filter(q => q.isDiemLiet).length})
                 </MenuItem>
@@ -355,6 +388,7 @@ const Practice = () => {
           </Typography>
         </Alert>
       )}
+      <SoundControl />
     </Container>
   );
 };

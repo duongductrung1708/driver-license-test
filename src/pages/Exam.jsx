@@ -187,7 +187,7 @@ const Exam = () => {
     const mode = isFullExam ? 'full' : isWrongExam ? 'wrong' : isSpeedExam ? 'speed' : 'default';
 
     // Evaluate and unlock achievements
-    const unlocked = evaluateAndUnlockAchievements({
+    const achievementResult = evaluateAndUnlockAchievements({
       isPassed,
       score: Math.round((correctCount / TOTAL_QUESTIONS) * 100),
       totalQuestions: TOTAL_QUESTIONS,
@@ -199,6 +199,9 @@ const Exam = () => {
       hasDiemLietWrong: diemLietWrongCount > 0,
       diemLietWrongCount
     });
+
+    // Add newly unlocked achievements to exam result
+    examResult.newAchievements = achievementResult.newlyUnlocked;
 
     // Navigate to result page with data
     navigate('/result', {
@@ -212,7 +215,7 @@ const Exam = () => {
         isPassed,
         hasDiemLietWrong: diemLietWrongCount > 0,
         diemLietWrongCount,
-        newlyUnlockedAchievements: unlocked
+        newlyUnlockedAchievements: achievementResult.newlyUnlocked
       }
     });
   };
