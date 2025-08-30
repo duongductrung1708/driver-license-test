@@ -286,7 +286,7 @@ const Home = () => {
       <SearchQuestions />
 
       {/* Các chế độ học */}
-      <Grid container spacing={4} alignItems="stretch" sx={{ mb: 6 }}>
+      <Grid container spacing={{lg: 4, md: 4, sm: 5, xs: 4}} alignItems="stretch" sx={{ mb: 6 }}>
         {features.map((feature, index) => (
           <Grid item xs={12} sm={6} md={3} key={index} sx={{ display: "flex" }}>
             <Card
@@ -294,6 +294,7 @@ const Home = () => {
               style={{ animationDelay: `${index * 0.2}s` }}
               sx={{
                 height: "100%",
+                width: {lg: "22.5rem", sm: "28.5rem", xs: "25rem"},
                 display: "flex",
                 flexDirection: "column",
                 cursor: "pointer",
