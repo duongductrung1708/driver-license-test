@@ -33,6 +33,20 @@ const ExamGoalSetter = () => {
   const [minutesRemaining, setMinutesRemaining] = useState(0);
   const [progress, setProgress] = useState(0);
 
+  // Helpers to parse date string (YYYY-MM-DD) as LOCAL date to avoid UTC shift
+  const parseLocalDate = (dateString) => {
+    if (!dateString) return null;
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  // End of day for countdown so the selected day counts until 23:59:59 local
+  const parseLocalDateEndOfDay = (dateString) => {
+    if (!dateString) return null;
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day, 23, 59, 59, 999);
+  };
+
   // Load exam date from localStorage
   useEffect(() => {
     const savedDate = localStorage.getItem('examGoalDate');
@@ -47,7 +61,7 @@ const ExamGoalSetter = () => {
 
     const updateCountdown = () => {
       const now = new Date();
-      const exam = new Date(examDate);
+      const exam = parseLocalDateEndOfDay(examDate);
       const diff = exam - now;
 
       if (diff > 0) {
@@ -94,6 +108,16 @@ const ExamGoalSetter = () => {
     setProgress(0);
   };
 
+  const handleOpenDatePicker = () => {
+    console.log('Opening date picker...');
+    setShowDatePicker(true);
+  };
+
+  const handleCloseDatePicker = () => {
+    console.log('Closing date picker...');
+    setShowDatePicker(false);
+  };
+
   const getMotivationalMessage = () => {
     if (daysRemaining === 0) {
       return "🎉 Chúc mừng! Hôm nay là ngày thi của bạn!";
@@ -120,40 +144,37 @@ const ExamGoalSetter = () => {
     return `${days} ngày`;
   };
 
-  if (!examDate) {
-    return (
-      <Card sx={{ mb: 4, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
-        <CardContent sx={{ textAlign: 'center', py: 4 }}>
-          <Event sx={{ fontSize: 60, mb: 2, opacity: 0.8 }} />
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>
-            🎯 Đặt Mục Tiêu Ngày Thi
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-            Chọn ngày thi dự kiến của bạn để nhận lời nhắc và tạo động lực!
-          </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<CalendarToday />}
-            onClick={() => setShowDatePicker(true)}
-            sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              color: 'white',
-              border: '2px solid rgba(255, 255, 255, 0.3)',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.3)',
-              },
-            }}
-          >
-            Đặt ngày thi
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <>
+      {!examDate ? (
+        <Card sx={{ mb: 4, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
+          <CardContent sx={{ textAlign: 'center', py: 4 }}>
+            <Event sx={{ fontSize: 60, mb: 2, opacity: 0.8 }} />
+            <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>
+              🎯 Đặt Mục Tiêu Ngày Thi
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
+              Chọn ngày thi dự kiến của bạn để nhận lời nhắc và tạo động lực!
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<CalendarToday />}
+              onClick={handleOpenDatePicker}
+              sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                },
+              }}
+            >
+              Đặt ngày thi
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
       <Card sx={{ mb: 4, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
         <CardContent sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
@@ -167,7 +188,7 @@ const ExamGoalSetter = () => {
             </Box>
             <Box sx={{ display: 'flex', gap: 1 }}>
               <IconButton
-                onClick={() => setShowDatePicker(true)}
+                onClick={handleOpenDatePicker}
                 sx={{ color: 'white', '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' } }}
               >
                 <Edit />
@@ -184,7 +205,7 @@ const ExamGoalSetter = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
             <Event sx={{ fontSize: 24 }} />
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              {new Date(examDate).toLocaleDateString('vi-VN', {
+              {parseLocalDate(examDate)?.toLocaleDateString('vi-VN', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
@@ -261,6 +282,7 @@ const ExamGoalSetter = () => {
           </Box>
         </CardContent>
       </Card>
+      )}
 
       {/* Date Picker Dialog */}
       <Dialog open={showDatePicker} onClose={() => setShowDatePicker(false)} maxWidth="sm" fullWidth>

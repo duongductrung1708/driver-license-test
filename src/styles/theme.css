@@ -342,3 +342,33 @@ body {
     color: black !important;
   }
 }
+
+/* Ensure Dialog is always visible */
+.MuiDialog-root {
+  z-index: 9999 !important;
+}
+
+.MuiDialog-paper {
+  z-index: 10000 !important;
+  position: relative !important;
+}
+
+/* Backdrop styling */
+.MuiBackdrop-root {
+  z-index: 9998 !important;
+}
+
+/* Additional Dialog styling to ensure visibility */
+.MuiDialog-root .MuiDialog-paper {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 12px !important;
+}
+
+/* Ensure Dialog content is visible */
+.MuiDialogContent-root {
+  padding: 24px !important;
+}
+
+.MuiDialogActions-root {
+  padding: 16px 24px !important;
+}
