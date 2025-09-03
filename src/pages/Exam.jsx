@@ -149,7 +149,10 @@ const Exam = () => {
       }
     });
 
-    const isPassed = correctCount >= 21 && diemLietWrongCount === 0;
+    const actualTotalQuestions = examQuestions.length;
+    const isPassed = isWrongExam
+      ? (correctCount === actualTotalQuestions)
+      : (correctCount >= 21 && diemLietWrongCount === 0);
     setHasDiemLietWrong(diemLietWrongCount > 0);
 
     // Save wrong answers to localStorage
@@ -167,19 +170,15 @@ const Exam = () => {
     // Save exam history to localStorage
     const examResult = {
       timestamp: new Date().toISOString(),
-      score: Math.round((correctCount / TOTAL_QUESTIONS) * 100),
+      score: Math.round((correctCount / (actualTotalQuestions || 1)) * 100),
       correctCount,
-      wrongCount: TOTAL_QUESTIONS - correctCount,
-      unansweredCount: TOTAL_QUESTIONS - Object.keys(answers).length,
-      totalQuestions: TOTAL_QUESTIONS,
+      wrongCount: actualTotalQuestions - correctCount,
+      unansweredCount: actualTotalQuestions - Object.keys(answers).length,
+      totalQuestions: actualTotalQuestions,
       isPassed,
       hasDiemLietWrong: diemLietWrongCount > 0,
       diemLietWrongCount
     };
-
-    const existingHistory = JSON.parse(localStorage.getItem('examHistory') || '[]');
-    const updatedHistory = [examResult, ...existingHistory];
-    localStorage.setItem('examHistory', JSON.stringify(updatedHistory));
 
     // Compute duration & mode for achievements
     const finishedAt = new Date();
@@ -189,8 +188,8 @@ const Exam = () => {
     // Evaluate and unlock achievements
     const achievementResult = evaluateAndUnlockAchievements({
       isPassed,
-      score: Math.round((correctCount / TOTAL_QUESTIONS) * 100),
-      totalQuestions: TOTAL_QUESTIONS,
+      score: Math.round((correctCount / (actualTotalQuestions || 1)) * 100),
+      totalQuestions: actualTotalQuestions,
       wrongAnswers: wrongAnswersList,
       allAnswers: allAnswersList,
       mode,
@@ -203,18 +202,24 @@ const Exam = () => {
     // Add newly unlocked achievements to exam result
     examResult.newAchievements = achievementResult.newlyUnlocked;
 
+    // Save exam history to localStorage (after attaching new achievements)
+    const existingHistory = JSON.parse(localStorage.getItem('examHistory') || '[]');
+    const updatedHistory = [examResult, ...existingHistory];
+    localStorage.setItem('examHistory', JSON.stringify(updatedHistory));
+
     // Navigate to result page with data
     navigate('/result', {
       state: {
-        totalQuestions: TOTAL_QUESTIONS,
+        totalQuestions: actualTotalQuestions,
         correctCount,
-        wrongCount: TOTAL_QUESTIONS - correctCount,
-        unansweredCount: TOTAL_QUESTIONS - Object.keys(answers).length,
+        wrongCount: actualTotalQuestions - correctCount,
+        unansweredCount: actualTotalQuestions - Object.keys(answers).length,
         wrongAnswers: wrongAnswersList,
         allAnswers: allAnswersList,
         isPassed,
         hasDiemLietWrong: diemLietWrongCount > 0,
         diemLietWrongCount,
+        mode,
         newlyUnlockedAchievements: achievementResult.newlyUnlocked
       }
     });
@@ -251,18 +256,22 @@ const Exam = () => {
           </Typography>
           
           <Box sx={{ my: 4 }}>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              • Số câu hỏi: <strong>{TOTAL_QUESTIONS} câu</strong>
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              • Thời gian: <strong>{isFullExam ? '190 phút' : isSpeedExam ? '5 phút' : '19 phút'}</strong>
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              • Điểm đạt: <strong>≥ 21 câu đúng</strong>
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              • Yêu cầu: <strong>Không được sai câu điểm liệt</strong>
-            </Typography>
+            {!isWrongExam && (
+              <>
+                <Typography variant="body1" sx={{ mb: 2 }}>
+                  • Số câu hỏi: <strong>{TOTAL_QUESTIONS} câu</strong>
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 2 }}>
+                  • Thời gian: <strong>{isFullExam ? '190 phút' : isSpeedExam ? '5 phút' : '19 phút'}</strong>
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 2 }}>
+                  • Điểm đạt: <strong>≥ 21 câu đúng</strong>
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 2 }}>
+                  • Yêu cầu: <strong>Không được sai câu điểm liệt</strong>
+                </Typography>
+              </>
+            )}
           </Box>
 
           <Alert severity="info" sx={{ mb: 3 }}>

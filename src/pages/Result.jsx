@@ -46,7 +46,8 @@ const Result = () => {
     allAnswers,
     isPassed,
     hasDiemLietWrong,
-    diemLietWrongCount
+    diemLietWrongCount,
+    mode
   } = resultData;
 
   const score = Math.round((correctCount / totalQuestions) * 100);
@@ -171,30 +172,47 @@ const Result = () => {
           Kiểm tra yêu cầu
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              {correctCount >= 21 ? (
-                <CheckCircle sx={{ color: '#4caf50' }} />
-              ) : (
-                <Cancel sx={{ color: '#f44336' }} />
-              )}
-              <Typography variant="body1">
-                Đúng ≥ 21 câu: {correctCount}/21
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              {!hasDiemLietWrong ? (
-                <CheckCircle sx={{ color: '#4caf50' }} />
-              ) : (
-                <Cancel sx={{ color: '#f44336' }} />
-              )}
-              <Typography variant="body1">
-                Không sai câu điểm liệt: {hasDiemLietWrong ? 'Không đạt' : 'Đạt'}
-              </Typography>
-            </Box>
-          </Grid>
+          {mode === 'wrong' ? (
+            <Grid item xs={12}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                {correctCount === totalQuestions ? (
+                  <CheckCircle sx={{ color: '#4caf50' }} />
+                ) : (
+                  <Cancel sx={{ color: '#f44336' }} />
+                )}
+                <Typography variant="body1">
+                  Trả lời đúng tất cả câu sai: {correctCount}/{totalQuestions}
+                </Typography>
+              </Box>
+            </Grid>
+          ) : (
+            <>
+              <Grid item xs={12} sm={6}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  {correctCount >= 21 ? (
+                    <CheckCircle sx={{ color: '#4caf50' }} />
+                  ) : (
+                    <Cancel sx={{ color: '#f44336' }} />
+                  )}
+                  <Typography variant="body1">
+                    Đúng ≥ 21 câu: {correctCount}/21
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  {!hasDiemLietWrong ? (
+                    <CheckCircle sx={{ color: '#4caf50' }} />
+                  ) : (
+                    <Cancel sx={{ color: '#f44336' }} />
+                  )}
+                  <Typography variant="body1">
+                    Không sai câu điểm liệt: {hasDiemLietWrong ? 'Không đạt' : 'Đạt'}
+                  </Typography>
+                </Box>
+              </Grid>
+            </>
+          )}
         </Grid>
       </Paper>
 

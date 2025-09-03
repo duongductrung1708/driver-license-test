@@ -42,8 +42,8 @@ const SoundControl = () => {
   };
 
   return (
-    <Box sx={{ position: 'fixed', bottom: 20, right: 20, zIndex: 1300 }}>
-      <Paper sx={{ p: 1.5, display: 'flex', alignItems: 'center', gap: 1 }} elevation={6}>
+    <Box sx={{ position: 'fixed', bottom: 12, right: 12, zIndex: 1300 }}>
+      <Paper sx={{ p: 1, display: 'flex', alignItems: 'center', gap: 0.5, borderRadius: 2 }} elevation={6}>
         <Tooltip title={muted ? 'Bật âm thanh' : 'Tắt âm thanh'}>
           <IconButton onClick={toggleMute} size="small">
             {muted ? <VolumeOff /> : <VolumeUp />}
@@ -56,7 +56,8 @@ const SoundControl = () => {
           max={1}
           step={0.05}
           onChange={handleVolumeChange}
-          sx={{ width: 140 }}
+          size="small"
+          sx={{ width: 96, mx: 0.5 }}
         />
       </Paper>
     </Box>

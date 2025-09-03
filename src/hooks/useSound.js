@@ -10,6 +10,8 @@ export default function useSound() {
 
   const playTone = (frequency = 440, durationMs = 200, type = 'sine', defaultVolume = 0.2) => {
     if (!audio) return;
+    // hard mute guard at the lowest level
+    try { if (localStorage.getItem('soundMuted') === '1') return; } catch {}
     // read current user volume (0.0 - 1.0) from localStorage
     let stored = 0.2;
     try {
