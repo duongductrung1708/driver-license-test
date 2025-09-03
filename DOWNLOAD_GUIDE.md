@@ -31,13 +31,16 @@
 ## Đặc điểm của file PDF
 
 - **Định dạng:** PDF chuẩn, có thể mở trên mọi thiết bị
-- **Font chữ:** Hỗ trợ tiếng Việt
+- **Font chữ:** Helvetica - font sans-serif, hiển thị rõ ràng
+- **Tiếng Việt:** Sử dụng không dấu để tránh lỗi font
+- **Text wrapping:** Tự động xuống dòng khi text quá dài
 - **Màu sắc:**
   - Đáp án đúng: Màu xanh lá ✓
   - Câu điểm liệt: Được đánh dấu rõ ràng
   - Giải thích: Màu xanh dương
 - **Tự động phân trang:** Khi nội dung dài
 - **Tên file:** Tự động đặt tên theo nội dung
+- **Kích thước font:** Tối ưu để dễ đọc
 
 ## Lưu ý quan trọng
 

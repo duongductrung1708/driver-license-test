@@ -1,51 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, IconButton, Slider, Paper, Tooltip } from '@mui/material';
 import { VolumeUp, VolumeOff } from '@mui/icons-material';
+import { useSound } from '../context/SoundContext';
 
 const SoundControl = () => {
   const [open, setOpen] = useState(false);
-  const [volume, setVolume] = useState(0.2);
-  const [muted, setMuted] = useState(false);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('soundVolume');
-      if (raw !== null) {
-        const parsed = parseFloat(raw);
-        if (!Number.isNaN(parsed)) setVolume(Math.max(0, Math.min(1, parsed)));
-      }
-      const m = localStorage.getItem('soundMuted');
-      if (m === '1') setMuted(true);
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    try {
-      if (muted) {
-        localStorage.setItem('soundMuted', '1');
-      } else {
-        localStorage.removeItem('soundMuted');
-      }
-    } catch {}
-  }, [muted]);
+  const { volume, muted, updateVolume, toggleMute } = useSound();
 
   const handleVolumeChange = (_, value) => {
-    const v = Array.isArray(value) ? value[0] : value;
-    setVolume(v);
-    try {
-      localStorage.setItem('soundVolume', String(v));
-    } catch {}
+    const newVolume = Array.isArray(value) ? value[0] : value;
+    updateVolume(newVolume);
   };
 
-  const toggleMute = () => {
-    setMuted((m) => !m);
+  const handleMuteToggle = () => {
+    toggleMute();
   };
 
   return (
     <Box sx={{ position: 'fixed', bottom: 12, right: 12, zIndex: 1300 }}>
       <Paper sx={{ p: 1, display: 'flex', alignItems: 'center', gap: 0.5, borderRadius: 2 }} elevation={6}>
         <Tooltip title={muted ? 'Bật âm thanh' : 'Tắt âm thanh'}>
-          <IconButton onClick={toggleMute} size="small">
+          <IconButton onClick={handleMuteToggle} size="small">
             {muted ? <VolumeOff /> : <VolumeUp />}
           </IconButton>
         </Tooltip>

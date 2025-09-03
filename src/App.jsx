@@ -4,6 +4,7 @@ import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/st
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from './context/ThemeContext';
 import { useTheme } from './context/ThemeContext';
+import { SoundProvider } from './context/SoundContext';
 import Home from './pages/Home';
 import Practice from './pages/Practice';
 import Exam from './pages/Exam';
@@ -158,7 +159,9 @@ const AppContent = () => {
 function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <SoundProvider>
+        <AppContent />
+      </SoundProvider>
     </ThemeProvider>
   );
 }

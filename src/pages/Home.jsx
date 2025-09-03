@@ -32,9 +32,11 @@ import SearchQuestions from "../components/SearchQuestions";
 import ExamGoalSetter from "../components/ExamGoalSetter";
 import AchievementNotification from "../components/AchievementNotification";
 import SoundControl from "../components/SoundControl";
+import { useSound } from "../context/SoundContext";
 
 const Home = () => {
   const navigate = useNavigate();
+  const { playClickSound, playSuccessSound } = useSound();
   const [examHistory, setExamHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [unlockedAchievements, setUnlockedAchievements] = useState([]);
@@ -92,129 +94,165 @@ const Home = () => {
 
   const handleClearHistory = () => {
     if (examHistory.length === 0) return;
+    playClickSound();
     const confirmClear = window.confirm(
       "Bạn có chắc muốn xóa toàn bộ lịch sử thi?"
     );
     if (!confirmClear) return;
     localStorage.removeItem("examHistory");
     setExamHistory([]);
+    playSuccessSound();
   };
 
   // Hàm tạo và tải về PDF 20 câu điểm liệt
   const handleDownloadDiemLiet = () => {
+    playClickSound();
     const diemLietQuestions = questionsData.filter(q => q.isDiemLiet === true);
     
     const doc = new jsPDF();
     
+    // Thiết lập font mặc định (có hỗ trợ Unicode tốt hơn)
+    doc.setFont('helvetica');
+    
     // Tiêu đề
-    doc.setFontSize(20);
+    doc.setFontSize(16);
     doc.setFont(undefined, 'bold');
-    doc.text('20 CÂU ĐIỂM LIỆT - THI BẰNG LÁI XE', 105, 20, { align: 'center' });
+    const titleText = '20 CAU DIEM LIET - THI BANG LAI XE';
+    const titleLines = doc.splitTextToSize(titleText, 180);
+    doc.text(titleLines, 105, 20, { align: 'center' });
     
     // Cảnh báo
-    doc.setFontSize(12);
+    doc.setFontSize(10);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(255, 0, 0);
-    doc.text('⚠️ CẢNH BÁO: Sai 1 câu điểm liệt = Trượt ngay lập tức!', 105, 35, { align: 'center' });
+    const warningText = 'CANH BAO: Sai 1 cau diem liet = Truot ngay lap tuc!';
+    const warningLines = doc.splitTextToSize(warningText, 180);
+    doc.text(warningLines, 105, 30, { align: 'center' });
     
-    let yPosition = 50;
+    let yPosition = 40;
     doc.setTextColor(0, 0, 0);
     
     diemLietQuestions.forEach((question, index) => {
-      if (yPosition > 270) {
+      // Kiểm tra nếu cần thêm trang mới
+      if (yPosition > 250) {
         doc.addPage();
         yPosition = 20;
       }
       
       // Số câu hỏi
-      doc.setFontSize(12);
+      doc.setFontSize(10);
       doc.setFont(undefined, 'bold');
-      doc.text(`${index + 1}. ${question.question}`, 20, yPosition);
-      yPosition += 8;
+      const questionText = `${index + 1}. ${question.question}`;
+      const questionLines = doc.splitTextToSize(questionText, 160);
+      doc.text(questionLines, 20, yPosition);
+      yPosition += questionLines.length * 6 + 5;
       
       // Hình ảnh (nếu có)
       if (question.image) {
-        doc.setFontSize(10);
+        doc.setFontSize(8);
         doc.setFont(undefined, 'normal');
         doc.setTextColor(100, 100, 100);
-        doc.text(`[Hình ảnh: ${question.image}]`, 25, yPosition);
-        yPosition += 6;
+        const imageText = `[Hinh anh: ${question.image}]`;
+        const imageLines = doc.splitTextToSize(imageText, 160);
+        doc.text(imageLines, 25, yPosition);
+        yPosition += imageLines.length * 5 + 3;
       }
       
       // Các đáp án
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setFont(undefined, 'normal');
       doc.setTextColor(0, 0, 0);
       question.answers.forEach((answer, ansIndex) => {
         const marker = ansIndex === question.correctAnswer ? "✓" : "○";
+        const answerText = `${marker} ${answer}`;
+        const answerLines = doc.splitTextToSize(answerText, 150);
         const color = ansIndex === question.correctAnswer ? [0, 128, 0] : [0, 0, 0];
         doc.setTextColor(...color);
-        doc.text(`${marker} ${answer}`, 30, yPosition);
-        yPosition += 5;
+        doc.text(answerLines, 30, yPosition);
+        yPosition += answerLines.length * 5 + 3;
       });
       
       // Giải thích
       doc.setTextColor(0, 0, 128);
-      doc.text(`Giải thích: ${question.explanation}`, 25, yPosition);
-      yPosition += 10;
+      const explanationText = `Giai thich: ${question.explanation}`;
+      const explanationLines = doc.splitTextToSize(explanationText, 150);
+      doc.text(explanationLines, 25, yPosition);
+      yPosition += explanationLines.length * 5 + 8;
     });
     
     doc.save('20-cau-diem-liet.pdf');
+    playSuccessSound();
   };
 
   // Hàm tạo và tải về PDF 250 câu hỏi
   const handleDownloadFullQuestions = () => {
+    playClickSound();
     const doc = new jsPDF();
     
+    // Thiết lập font mặc định (có hỗ trợ Unicode tốt hơn)
+    doc.setFont('helvetica');
+    
     // Tiêu đề
-    doc.setFontSize(20);
+    doc.setFontSize(16);
     doc.setFont(undefined, 'bold');
-    doc.text('BỘ ĐỀ 250 CÂU HỎI THI BẰNG LÁI XE', 105, 20, { align: 'center' });
+    const titleText = 'BO DE 250 CAU HOI THI BANG LAI XE';
+    const titleLines = doc.splitTextToSize(titleText, 180);
+    doc.text(titleLines, 105, 20, { align: 'center' });
     
     let yPosition = 35;
     doc.setTextColor(0, 0, 0);
     
     questionsData.forEach((question, index) => {
-      if (yPosition > 270) {
+      // Kiểm tra nếu cần thêm trang mới
+      if (yPosition > 250) {
         doc.addPage();
         yPosition = 20;
       }
       
       // Số câu hỏi và nội dung
-      doc.setFontSize(12);
+      doc.setFontSize(10);
       doc.setFont(undefined, 'bold');
-      const diemLietMarker = question.isDiemLiet ? " [ĐIỂM LIỆT]" : "";
-      doc.text(`${index + 1}. ${question.question}${diemLietMarker}`, 20, yPosition);
-      yPosition += 8;
+      const diemLietMarker = question.isDiemLiet ? " [DIEM LIET]" : "";
+      const questionText = `${index + 1}. ${question.question}${diemLietMarker}`;
+      const questionLines = doc.splitTextToSize(questionText, 160);
+      doc.text(questionLines, 20, yPosition);
+      yPosition += questionLines.length * 6 + 5;
       
       // Hình ảnh (nếu có)
       if (question.image) {
-        doc.setFontSize(10);
+        doc.setFontSize(8);
         doc.setFont(undefined, 'normal');
         doc.setTextColor(100, 100, 100);
-        doc.text(`[Hình ảnh: ${question.image}]`, 25, yPosition);
-        yPosition += 6;
+        const imageText = `[Hinh anh: ${question.image}]`;
+        const imageLines = doc.splitTextToSize(imageText, 160);
+        doc.text(imageLines, 25, yPosition);
+        yPosition += imageLines.length * 5 + 3;
       }
       
       // Các đáp án
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setFont(undefined, 'normal');
       doc.setTextColor(0, 0, 0);
       question.answers.forEach((answer, ansIndex) => {
         const marker = ansIndex === question.correctAnswer ? "✓" : "○";
+        const answerText = `${marker} ${answer}`;
+        const answerLines = doc.splitTextToSize(answerText, 150);
         const color = ansIndex === question.correctAnswer ? [0, 128, 0] : [0, 0, 0];
         doc.setTextColor(...color);
-        doc.text(`${marker} ${answer}`, 30, yPosition);
-        yPosition += 5;
+        doc.text(answerLines, 30, yPosition);
+        yPosition += answerLines.length * 5 + 3;
       });
       
       // Giải thích
       doc.setTextColor(0, 0, 128);
-      doc.text(`Giải thích: ${question.explanation}`, 25, yPosition);
-      yPosition += 10;
+      const explanationText = `Giai thich: ${question.explanation}`;
+      const explanationLines = doc.splitTextToSize(explanationText, 150);
+      doc.text(explanationLines, 25, yPosition);
+      yPosition += explanationLines.length * 5 + 8;
     });
     
     doc.save('250-cau-hoi-thi-bang-lai.pdf');
+    playSuccessSound();
   };
 
 
@@ -224,14 +262,20 @@ const Home = () => {
       icon: <School sx={{ fontSize: 40, color: "primary.main" }} />,
       title: "Ôn tập 25 câu",
       description: "Ôn tập với 25 câu hỏi ngẫu nhiên",
-      action: () => navigate("/practice", { state: { mode: "random" } }),
+      action: () => {
+        playClickSound();
+        navigate("/practice", { state: { mode: "random" } });
+      },
       buttonColor: 'primary',
     },
     {
       icon: <School sx={{ fontSize: 40, color: "warning.main" }} />,
       title: "Ôn tập toàn bộ",
       description: "Ôn tập toàn bộ 250 câu hỏi",
-      action: () => navigate("/practice", { state: { mode: "full" } }),
+      action: () => {
+        playClickSound();
+        navigate("/practice", { state: { mode: "full" } });
+      },
       buttonColor: 'warning',
     },
     {
@@ -240,7 +284,10 @@ const Home = () => {
       description: wrongCount > 0 
         ? "Luyện tập lại những câu bạn đã làm sai"
         : "Bạn chưa có câu hỏi nào sai. Hãy làm bài thi thử trước.",
-      action: () => navigate("/practice", { state: { mode: "wrong" } }),
+      action: () => {
+        playClickSound();
+        navigate("/practice", { state: { mode: "wrong" } });
+      },
       buttonColor: 'secondary',
       disabled: wrongCount === 0,
     },
@@ -248,21 +295,30 @@ const Home = () => {
       icon: <Warning sx={{ fontSize: 40, color: "error.main" }} />,
       title: "Học câu điểm liệt",
       description: "Ôn tập 20 câu điểm liệt quan trọng",
-      action: () => navigate("/practice", { state: { mode: "diemLiet" } }),
+      action: () => {
+        playClickSound();
+        navigate("/practice", { state: { mode: "diemLiet" } });
+      },
       buttonColor: 'error',
     },
     {
       icon: <Quiz sx={{ fontSize: 40, color: "success.main" }} />,
       title: "Thi thử",
       description: "Làm bài thi 25 câu trong 19 phút",
-      action: () => navigate("/exam"),
+      action: () => {
+        playClickSound();
+        navigate("/exam");
+      },
       buttonColor: 'success',
     },
     {
       icon: <Quiz sx={{ fontSize: 40, color: "info.main" }} />,
       title: "Thi full bộ đề",
       description: "Thi toàn bộ câu hỏi trong 190 phút",
-      action: () => navigate("/exam", { state: { mode: "full" } }),
+      action: () => {
+        playClickSound();
+        navigate("/exam", { state: { mode: "full" } });
+      },
       buttonColor: 'info',
     },
     {
@@ -271,7 +327,10 @@ const Home = () => {
       description: wrongCount > 0 
         ? "Thi lại dựa trên danh sách câu sai"
         : "Bạn chưa có câu hỏi nào sai. Hãy làm bài thi thử trước.",
-      action: () => navigate("/exam", { state: { mode: "wrong" } }),
+      action: () => {
+        playClickSound();
+        navigate("/exam", { state: { mode: "wrong" } });
+      },
       buttonColor: 'secondary',
       disabled: wrongCount === 0,
     },
@@ -279,7 +338,10 @@ const Home = () => {
       icon: <Speed sx={{ fontSize: 40, color: "warning.main" }} />,
       title: "Thi tốc độ 5 phút",
       description: "25 câu trong 5 phút (tốc độ)",
-      action: () => navigate("/exam", { state: { mode: "speed" } }),
+      action: () => {
+        playClickSound();
+        navigate("/exam", { state: { mode: "speed" } });
+      },
       buttonColor: 'warning',
     },
   ];
@@ -629,13 +691,16 @@ const Home = () => {
             Lịch sử thi thử
           </Typography>
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Button
-              variant="outlined"
-              startIcon={<History />}
-              onClick={() => setShowHistory(!showHistory)}
-            >
-              {showHistory ? "Ẩn lịch sử" : "Xem lịch sử"}
-            </Button>
+                         <Button
+               variant="outlined"
+               startIcon={<History />}
+               onClick={() => {
+                 playClickSound();
+                 setShowHistory(!showHistory);
+               }}
+             >
+               {showHistory ? "Ẩn lịch sử" : "Xem lịch sử"}
+             </Button>
             <Button
               variant="outlined"
               color="error"
@@ -796,6 +861,41 @@ const Home = () => {
         />
       )}
       <SoundControl />
+      
+      {/* Footer */}
+      <Box
+        component="footer"
+        sx={{
+          mt: 8,
+          py: 3,
+          px: 2,
+          backgroundColor: 'background.paper',
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          textAlign: 'center',
+        }}
+      >
+        <Container maxWidth="lg">
+          <Typography variant="body2" color="text.secondary">
+            © 2025 Ôn Thi Bằng Lái Xe Online. Phát triển bởi{' '}
+            <Typography
+              component="span"
+              variant="body2"
+              sx={{
+                fontWeight: 'bold',
+                color: 'primary.main',
+                fontStyle: 'italic',
+              }}
+            >
+              HanKoonE
+            </Typography>
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+            Hệ thống ôn tập và thi thử bằng lái xe máy A1 với 250 câu hỏi mẫu
+          </Typography>
+        </Container>
+      </Box>
+
     </Container>
   );
 };
