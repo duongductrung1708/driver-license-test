@@ -37,6 +37,7 @@ const Home = () => {
   const [unlockedAchievements, setUnlockedAchievements] = useState([]);
   const [streakCount, setStreakCount] = useState(0);
   const [newAchievement, setNewAchievement] = useState(null);
+  const [wrongCount, setWrongCount] = useState(0);
 
   // Load exam history from localStorage
   useEffect(() => {
@@ -44,6 +45,8 @@ const Home = () => {
     setExamHistory(history);
     setUnlockedAchievements(getUnlockedAchievements());
     setStreakCount(getCurrentStreak());
+    const savedWrong = JSON.parse(localStorage.getItem("wrongAnswers") || "[]");
+    setWrongCount(Array.isArray(savedWrong) ? savedWrong.length : 0);
   }, []);
 
   // Check for new achievements from exam history
@@ -111,10 +114,13 @@ const Home = () => {
     },
     {
       icon: <History sx={{ fontSize: 40, color: "secondary.main" }} />,
-      title: "Ôn tập các câu sai",
-      description: "Luyện tập lại những câu bạn đã làm sai",
+      title: `Ôn tập các câu sai (${wrongCount})`,
+      description: wrongCount > 0 
+        ? "Luyện tập lại những câu bạn đã làm sai"
+        : "Bạn chưa có câu hỏi nào sai. Hãy làm bài thi thử trước.",
       action: () => navigate("/practice", { state: { mode: "wrong" } }),
       buttonColor: 'secondary',
+      disabled: wrongCount === 0,
     },
     {
       icon: <Warning sx={{ fontSize: 40, color: "error.main" }} />,
@@ -139,10 +145,13 @@ const Home = () => {
     },
     {
       icon: <Quiz sx={{ fontSize: 40, color: "secondary.main" }} />,
-      title: "Thi các câu đã sai",
-      description: "Thi lại dựa trên danh sách câu sai",
+      title: `Thi các câu đã sai (${wrongCount})`,
+      description: wrongCount > 0 
+        ? "Thi lại dựa trên danh sách câu sai"
+        : "Bạn chưa có câu hỏi nào sai. Hãy làm bài thi thử trước.",
       action: () => navigate("/exam", { state: { mode: "wrong" } }),
       buttonColor: 'secondary',
+      disabled: wrongCount === 0,
     },
     {
       icon: <Speed sx={{ fontSize: 40, color: "warning.main" }} />,
@@ -297,13 +306,14 @@ const Home = () => {
                 width: {lg: "22.5rem", sm: "28.5rem", xs: "25rem"},
                 display: "flex",
                 flexDirection: "column",
-                cursor: "pointer",
+                cursor: feature.disabled ? "not-allowed" : "pointer",
+                opacity: feature.disabled ? 0.6 : 1,
                 "&:hover": {
-                  transform: "translateY(-8px)",
-                  boxShadow: "0 8px 25px rgba(0, 0, 0, 0.15)",
+                  transform: feature.disabled ? "none" : "translateY(-8px)",
+                  boxShadow: feature.disabled ? "none" : "0 8px 25px rgba(0, 0, 0, 0.15)",
                 },
               }}
-              onClick={feature.action}
+              onClick={feature.disabled ? undefined : feature.action}
             >
               <CardContent
                 sx={{
@@ -351,16 +361,17 @@ const Home = () => {
                 <Button
                   variant="contained"
                   size="large"
-                  onClick={feature.action}
+                  onClick={feature.disabled ? undefined : feature.action}
+                  disabled={feature.disabled}
                   sx={{
                     minWidth: 120,
-                    backgroundColor: `${feature.buttonColor}.main`,
+                    backgroundColor: feature.disabled ? 'grey.400' : `${feature.buttonColor}.main`,
                     "&:hover": {
-                      backgroundColor: `${feature.buttonColor}.dark`,
+                      backgroundColor: feature.disabled ? 'grey.400' : `${feature.buttonColor}.dark`,
                     },
                   }}
                 >
-                  Bắt đầu
+                  {feature.disabled ? 'Không khả dụng' : 'Bắt đầu'}
                 </Button>
               </CardContent>
             </Card>
@@ -412,6 +423,72 @@ const Home = () => {
                 Câu thường
               </Typography>
             </Box>
+          </Grid>
+        </Grid>
+      </Paper>
+
+      {/* Tải tài liệu học tập */}
+      <Paper sx={{ p: 3, mb: 4, backgroundColor: "background.default" }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: "bold", mb: 3 }}>
+          📥 Tải tài liệu học tập
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          Tải về các tài liệu học tập để ôn luyện offline hoặc in ra giấy
+        </Typography>
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={6}>
+            <Card
+              sx={{
+                height: "100%",
+                cursor: "pointer",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: "0 8px 25px rgba(0, 0, 0, 0.15)",
+                },
+                transition: "all 0.3s ease",
+              }}
+              onClick={handleDownloadDiemLiet}
+            >
+              <CardContent sx={{ textAlign: "center", p: 3 }}>
+                <Download sx={{ fontSize: 60, color: "error.main", mb: 2 }} />
+                <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: "bold" }}>
+                  20 CÂU ĐIỂM LIỆT
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Tải về bộ tài liệu 20 câu điểm liệt quan trọng
+                </Typography>
+                <Typography variant="caption" color="error.main" sx={{ fontWeight: "bold" }}>
+                  ⚠️ Cảnh báo: Sai 1 câu điểm liệt = Trượt ngay lập tức!
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Card
+              sx={{
+                height: "100%",
+                cursor: "pointer",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: "0 8px 25px rgba(0, 0, 0, 0.15)",
+                },
+                transition: "all 0.3s ease",
+              }}
+              onClick={handleDownloadFullQuestions}
+            >
+              <CardContent sx={{ textAlign: "center", p: 3 }}>
+                <Download sx={{ fontSize: 60, color: "primary.main", mb: 2 }} />
+                <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: "bold" }}>
+                  BỘ ĐỀ 250 CÂU HỎI
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Tải về toàn bộ bộ đề 250 câu hỏi thi bằng lái xe
+                </Typography>
+                <Typography variant="caption" color="primary.main" sx={{ fontWeight: "bold" }}>
+                  📚 Bao gồm cả câu điểm liệt và câu thường
+                </Typography>
+              </CardContent>
+            </Card>
           </Grid>
         </Grid>
       </Paper>
