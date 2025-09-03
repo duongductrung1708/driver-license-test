@@ -139,7 +139,7 @@ const Practice = () => {
         setIsAnswered(false);
       }
     }
-  }, [filter, practiceMode, customQuestionIds, wrongAnswers, randomQuestions]);
+  }, [filter, practiceMode, customQuestionIds, wrongAnswers, randomQuestions, currentQuestionIndex]);
 
   const currentQuestion = filteredQuestions[currentQuestionIndex];
 
