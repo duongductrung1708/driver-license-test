@@ -21,10 +21,13 @@ import {
   CheckCircle,
   History,
   Delete,
+  Download,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import questionsData from "../data/questions.json";
 import { ACHIEVEMENT_META, getUnlockedAchievements, getCurrentStreak } from "../components/achievements";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import SearchQuestions from "../components/SearchQuestions";
 import ExamGoalSetter from "../components/ExamGoalSetter";
 import AchievementNotification from "../components/AchievementNotification";
@@ -96,6 +99,125 @@ const Home = () => {
     localStorage.removeItem("examHistory");
     setExamHistory([]);
   };
+
+  // Hàm tạo và tải về PDF 20 câu điểm liệt
+  const handleDownloadDiemLiet = () => {
+    const diemLietQuestions = questionsData.filter(q => q.isDiemLiet === true);
+    
+    const doc = new jsPDF();
+    
+    // Tiêu đề
+    doc.setFontSize(20);
+    doc.setFont(undefined, 'bold');
+    doc.text('20 CÂU ĐIỂM LIỆT - THI BẰNG LÁI XE', 105, 20, { align: 'center' });
+    
+    // Cảnh báo
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(255, 0, 0);
+    doc.text('⚠️ CẢNH BÁO: Sai 1 câu điểm liệt = Trượt ngay lập tức!', 105, 35, { align: 'center' });
+    
+    let yPosition = 50;
+    doc.setTextColor(0, 0, 0);
+    
+    diemLietQuestions.forEach((question, index) => {
+      if (yPosition > 270) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      // Số câu hỏi
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.text(`${index + 1}. ${question.question}`, 20, yPosition);
+      yPosition += 8;
+      
+      // Hình ảnh (nếu có)
+      if (question.image) {
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text(`[Hình ảnh: ${question.image}]`, 25, yPosition);
+        yPosition += 6;
+      }
+      
+      // Các đáp án
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(0, 0, 0);
+      question.answers.forEach((answer, ansIndex) => {
+        const marker = ansIndex === question.correctAnswer ? "✓" : "○";
+        const color = ansIndex === question.correctAnswer ? [0, 128, 0] : [0, 0, 0];
+        doc.setTextColor(...color);
+        doc.text(`${marker} ${answer}`, 30, yPosition);
+        yPosition += 5;
+      });
+      
+      // Giải thích
+      doc.setTextColor(0, 0, 128);
+      doc.text(`Giải thích: ${question.explanation}`, 25, yPosition);
+      yPosition += 10;
+    });
+    
+    doc.save('20-cau-diem-liet.pdf');
+  };
+
+  // Hàm tạo và tải về PDF 250 câu hỏi
+  const handleDownloadFullQuestions = () => {
+    const doc = new jsPDF();
+    
+    // Tiêu đề
+    doc.setFontSize(20);
+    doc.setFont(undefined, 'bold');
+    doc.text('BỘ ĐỀ 250 CÂU HỎI THI BẰNG LÁI XE', 105, 20, { align: 'center' });
+    
+    let yPosition = 35;
+    doc.setTextColor(0, 0, 0);
+    
+    questionsData.forEach((question, index) => {
+      if (yPosition > 270) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      // Số câu hỏi và nội dung
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      const diemLietMarker = question.isDiemLiet ? " [ĐIỂM LIỆT]" : "";
+      doc.text(`${index + 1}. ${question.question}${diemLietMarker}`, 20, yPosition);
+      yPosition += 8;
+      
+      // Hình ảnh (nếu có)
+      if (question.image) {
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text(`[Hình ảnh: ${question.image}]`, 25, yPosition);
+        yPosition += 6;
+      }
+      
+      // Các đáp án
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(0, 0, 0);
+      question.answers.forEach((answer, ansIndex) => {
+        const marker = ansIndex === question.correctAnswer ? "✓" : "○";
+        const color = ansIndex === question.correctAnswer ? [0, 128, 0] : [0, 0, 0];
+        doc.setTextColor(...color);
+        doc.text(`${marker} ${answer}`, 30, yPosition);
+        yPosition += 5;
+      });
+      
+      // Giải thích
+      doc.setTextColor(0, 0, 128);
+      doc.text(`Giải thích: ${question.explanation}`, 25, yPosition);
+      yPosition += 10;
+    });
+    
+    doc.save('250-cau-hoi-thi-bang-lai.pdf');
+  };
+
+
 
   const features = [
     {

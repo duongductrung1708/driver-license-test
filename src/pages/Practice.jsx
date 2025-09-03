@@ -18,6 +18,7 @@ import {
   FilterList
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useMemo } from 'react';
 import QuizQuestion from '../components/QuizQuestion';
 import ProgressBar from '../components/ProgressBar';
 import DiemLietStats from '../components/DiemLietStats';
@@ -29,7 +30,7 @@ const Practice = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const practiceMode = location.state?.mode || 'full'; // Default to full mode
-  const customQuestionIds = location.state?.questionIds || [];
+  const customQuestionIds = useMemo(() => location.state?.questionIds || [], [location.state?.questionIds]);
   const searchTerm = location.state?.searchTerm || '';
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -38,6 +39,7 @@ const Practice = () => {
   const [filteredQuestions, setFilteredQuestions] = useState(questionsData);
   const [wrongAnswers, setWrongAnswers] = useState([]);
   const [answeredQuestions, setAnsweredQuestions] = useState({});
+  const [randomQuestions, setRandomQuestions] = useState([]);
   const { playCorrect, playIncorrect } = useSound();
 
   // Load wrong answers from localStorage
@@ -48,12 +50,9 @@ const Practice = () => {
     }
   }, []);
 
-  // Filter questions based on selected filter and practice mode
+  // Generate random questions once when entering random mode
   useEffect(() => {
-    let filtered = questionsData;
-    
-    // Apply practice mode filter first
-    if (practiceMode === 'random') {
+    if (practiceMode === 'random' && randomQuestions.length === 0) {
       // For random mode, select 25 random questions with exactly 2 diem liet
       const DIEM_LIET_NEEDED = 2;
       const TOTAL = 25;
@@ -67,14 +66,28 @@ const Practice = () => {
       const selectedDiemLiet = pick(diemLiet, DIEM_LIET_NEEDED);
       const remaining = TOTAL - selectedDiemLiet.length;
       const selectedNonDiemLiet = pick(nonDiemLiet, remaining);
-      filtered = shuffle([...selectedDiemLiet, ...selectedNonDiemLiet]);
+      const newRandomQuestions = shuffle([...selectedDiemLiet, ...selectedNonDiemLiet]);
+      setRandomQuestions(newRandomQuestions);
+    } else if (practiceMode !== 'random') {
+      // Clear random questions when switching to other modes
+      setRandomQuestions([]);
+    }
+  }, [practiceMode, randomQuestions.length]);
+
+  // Filter questions based on selected filter and practice mode
+  useEffect(() => {
+    let filtered = questionsData;
+    
+    // Apply practice mode filter first
+    if (practiceMode === 'random') {
+      // Use stored random questions instead of generating new ones
+      filtered = randomQuestions.length > 0 ? randomQuestions : questionsData;
     } else if (practiceMode === 'diemLiet') {
       // For diemLiet mode, select only diemLiet questions
       filtered = questionsData.filter(q => q.isDiemLiet);
     } else if (practiceMode === 'wrong') {
-      // Practice only wrong questions stored in localStorage
-      const savedWrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
-      const wrongQuestionIds = savedWrongAnswers.map(w => w.questionId);
+      // Practice only wrong questions from state
+      const wrongQuestionIds = wrongAnswers.map(w => w.questionId);
       filtered = questionsData.filter(q => wrongQuestionIds.includes(q.id));
     } else if (practiceMode === 'custom') {
       // Practice custom questions from search
@@ -87,8 +100,10 @@ const Practice = () => {
         filtered = filtered.filter(q => q.isDiemLiet);
         break;
       case 'wrong':
-        const wrongQuestionIds = wrongAnswers.map(w => w.questionId);
-        filtered = filtered.filter(q => wrongQuestionIds.includes(q.id));
+        {
+          const wrongQuestionIds = wrongAnswers.map(w => w.questionId);
+          filtered = filtered.filter(q => wrongQuestionIds.includes(q.id));
+        }
         break;
       default:
         // Keep the current filtered questions
@@ -96,26 +111,35 @@ const Practice = () => {
     }
     
     setFilteredQuestions(filtered);
-    setCurrentQuestionIndex(0);
-    setSelectedAnswer(null);
-    setIsAnswered(false);
-  }, [filter, practiceMode]); // Removed wrongAnswers from dependencies
-
-  // Separate effect to handle wrongAnswers changes only when in wrong filter mode
-  useEffect(() => {
-    if (filter === 'wrong') {
-      const wrongQuestionIds = wrongAnswers.map(w => w.questionId);
-      const filtered = questionsData.filter(q => wrongQuestionIds.includes(q.id));
-      setFilteredQuestions(filtered);
-      
-      // Only reset if current question index is out of bounds
-      if (currentQuestionIndex >= filtered.length) {
-        setCurrentQuestionIndex(0);
+    
+    // Only reset question index if we're not in wrong practice mode or if the current question is out of bounds
+    if ((practiceMode !== 'wrong' && practiceMode !== 'random') || currentQuestionIndex >= filtered.length) {
+      setCurrentQuestionIndex(0);
+      setSelectedAnswer(null);
+      setIsAnswered(false);
+    }
+    
+    // If we're in wrong practice mode and the current question is no longer in the filtered list, 
+    // adjust the index to stay within bounds
+    if (practiceMode === 'wrong' && filtered.length > 0 && currentQuestionIndex >= filtered.length) {
+      setCurrentQuestionIndex(Math.max(0, filtered.length - 1));
+      setSelectedAnswer(null);
+      setIsAnswered(false);
+    }
+    
+    // In wrong practice mode, ensure we don't have an invalid question index
+    if (practiceMode === 'wrong' && filtered.length > 0 && currentQuestionIndex < filtered.length) {
+      // Check if current question is still valid
+      const currentQuestionValid = filtered[currentQuestionIndex];
+      if (!currentQuestionValid) {
+        // Find the closest valid index
+        const validIndex = Math.min(currentQuestionIndex, filtered.length - 1);
+        setCurrentQuestionIndex(validIndex);
         setSelectedAnswer(null);
         setIsAnswered(false);
       }
     }
-  }, [wrongAnswers, filter, currentQuestionIndex, customQuestionIds]);
+  }, [filter, practiceMode, customQuestionIds, wrongAnswers, randomQuestions]);
 
   const currentQuestion = filteredQuestions[currentQuestionIndex];
 
@@ -153,6 +177,20 @@ const Practice = () => {
     // sound feedback
     if (isCorrect) {
       playCorrect();
+      // If this question was previously wrong, remove it from localStorage and state
+      const savedWrong = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
+      const filteredWrong = savedWrong.filter(w => w.questionId !== currentQuestion.id);
+      if (filteredWrong.length !== savedWrong.length) {
+        localStorage.setItem('wrongAnswers', JSON.stringify(filteredWrong));
+        setWrongAnswers(filteredWrong);
+        
+        // If we're in wrong practice mode and this was the last wrong question, reset to beginning
+        if (practiceMode === 'wrong' && filteredWrong.length === 0) {
+          setCurrentQuestionIndex(0);
+          setSelectedAnswer(null);
+          setIsAnswered(false);
+        }
+      }
     } else {
       playIncorrect();
     }
@@ -165,12 +203,33 @@ const Practice = () => {
         correctAnswer: currentQuestion.correctAnswer,
         timestamp: new Date().toISOString()
       };
-      
-      const updatedWrongAnswers = [...wrongAnswers, newWrongAnswer];
-      setWrongAnswers(updatedWrongAnswers);
+
+      // Deduplicate by questionId
+      const existing = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
+      const withoutThis = existing.filter(w => w.questionId !== newWrongAnswer.questionId);
+      const updatedWrongAnswers = [...withoutThis, newWrongAnswer];
       localStorage.setItem('wrongAnswers', JSON.stringify(updatedWrongAnswers));
+      setWrongAnswers(updatedWrongAnswers);
     }
   };
+
+  // Handle automatic transition to next question when current question is removed from wrong answers
+  useEffect(() => {
+    if (practiceMode === 'wrong' && filteredQuestions.length > 0) {
+      // Check if current question still exists in filtered questions
+      const currentQuestionExists = filteredQuestions.some(q => q.id === currentQuestion?.id);
+      
+      if (!currentQuestionExists && currentQuestion) {
+        // Current question was removed, find the next valid question
+        const nextIndex = Math.min(currentQuestionIndex, filteredQuestions.length - 1);
+        if (nextIndex !== currentQuestionIndex) {
+          setCurrentQuestionIndex(nextIndex);
+          setSelectedAnswer(null);
+          setIsAnswered(false);
+        }
+      }
+    }
+  }, [filteredQuestions, currentQuestion, currentQuestionIndex, practiceMode]);
 
   const getAnsweredCount = () => {
     return filteredQuestions.reduce((count, q) => count + (answeredQuestions[q.id] ? 1 : 0), 0);

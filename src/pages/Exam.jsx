@@ -155,7 +155,7 @@ const Exam = () => {
       : (correctCount >= 21 && diemLietWrongCount === 0);
     setHasDiemLietWrong(diemLietWrongCount > 0);
 
-    // Save wrong answers to localStorage
+    // Save wrong answers to localStorage (dedupe) and remove corrected ones
     const existingWrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
     const newWrongAnswers = wrongAnswersList.map(w => ({
       questionId: w.questionId,
@@ -163,8 +163,26 @@ const Exam = () => {
       correctAnswer: w.correctAnswer,
       timestamp: new Date().toISOString()
     }));
-    
-    const updatedWrongAnswers = [...existingWrongAnswers, ...newWrongAnswers];
+
+    // Build sets for efficient operations
+    const newlyWrongIds = new Set(newWrongAnswers.map(w => w.questionId));
+    const allAnsweredIds = new Set(allAnswersList.map(a => a.questionId));
+    const answeredCorrectIds = new Set(
+      allAnswersList.filter(a => a.isCorrect).map(a => a.questionId)
+    );
+
+    // 1) Remove any previously wrong questions that were answered correctly now
+    const keptOldWrong = existingWrongAnswers.filter(
+      w => !answeredCorrectIds.has(w.questionId)
+    );
+
+    // 2) Deduplicate: remove old entries for questions that are newly wrong in this exam
+    const dedupOldWrong = keptOldWrong.filter(
+      w => !newlyWrongIds.has(w.questionId)
+    );
+
+    // 3) Combine
+    const updatedWrongAnswers = [...dedupOldWrong, ...newWrongAnswers];
     localStorage.setItem('wrongAnswers', JSON.stringify(updatedWrongAnswers));
 
     // Save exam history to localStorage
