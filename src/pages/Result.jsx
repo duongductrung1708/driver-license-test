@@ -91,7 +91,17 @@ const Result = () => {
         }}
       >
         <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
-          Kết quả bài thi
+          {mode === "full"
+            ? "Kết quả thi full bộ đề"
+            : mode === "wrong"
+            ? "Kết quả thi các câu đã sai"
+            : mode === "trafficSign"
+            ? "Kết quả thi biển báo"
+            : mode === "diemLiet"
+            ? "Kết quả thi câu điểm liệt"
+            : mode === "speed"
+            ? "Kết quả thi tốc độ"
+            : "Kết quả bài thi"}
         </Typography>
         <Button
           variant="outlined"
@@ -202,6 +212,32 @@ const Result = () => {
                 )}
                 <Typography variant="body1">
                   Trả lời đúng tất cả câu sai: {correctCount}/{totalQuestions}
+                </Typography>
+              </Box>
+            </Grid>
+          ) : mode === "trafficSign" ? (
+            <Grid item xs={12}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                {correctCount >= 21 ? (
+                  <CheckCircle sx={{ color: "#4caf50" }} />
+                ) : (
+                  <Cancel sx={{ color: "#f44336" }} />
+                )}
+                <Typography variant="body1">
+                  Đúng ≥ 21 câu: {correctCount}/21
+                </Typography>
+              </Box>
+            </Grid>
+          ) : mode === "diemLiet" ? (
+            <Grid item xs={12}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                {correctCount === totalQuestions ? (
+                  <CheckCircle sx={{ color: "#4caf50" }} />
+                ) : (
+                  <Cancel sx={{ color: "#f44336" }} />
+                )}
+                <Typography variant="body1">
+                  Đúng tất cả câu điểm liệt: {correctCount}/{totalQuestions}
                 </Typography>
               </Box>
             </Grid>
@@ -428,7 +464,7 @@ const Result = () => {
           variant="contained"
           size="large"
           startIcon={<Refresh />}
-          onClick={() => navigate("/exam")}
+          onClick={() => navigate("/exam", { state: { mode: mode } })}
           sx={{
             backgroundColor: "primary.main",
             "&:hover": { backgroundColor: "primary.dark" },
@@ -440,9 +476,9 @@ const Result = () => {
         <Button
           variant="outlined"
           size="large"
-          onClick={() => navigate("/practice", { state: { mode: "full" } })}
+          onClick={() => navigate("/practice", { state: { mode: mode === "trafficSign" ? "trafficSign" : mode === "diemLiet" ? "diemLiet" : "full" } })}
         >
-          Ôn tập câu sai
+          {mode === "trafficSign" ? "Ôn tập biển báo" : mode === "diemLiet" ? "Ôn tập câu điểm liệt" : "Ôn tập câu sai"}
         </Button>
       </Box>
 

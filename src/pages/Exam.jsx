@@ -36,9 +36,11 @@ const Exam = () => {
   const isFullExam = urlParamsMode === "full";
   const isWrongExam = urlParamsMode === "wrong";
   const isSpeedExam = urlParamsMode === "speed";
+  const isTrafficSignExam = urlParamsMode === "trafficSign";
+  const isDiemLietExam = urlParamsMode === "diemLiet";
 
   const EXAM_DURATION = isFullExam ? 190 * 60 : isSpeedExam ? 5 * 60 : 19 * 60; // seconds
-  const TOTAL_QUESTIONS = isFullExam ? questionsData.length : 25;
+  const TOTAL_QUESTIONS = isFullExam ? questionsData.length : isTrafficSignExam ? questionsData.filter(q => q.isTrafficSign).length : isDiemLietExam ? questionsData.filter(q => q.isDiemLiet).length : 25;
 
   // Generate random exam questions
   const generateExamQuestions = () => {
@@ -53,6 +55,18 @@ const Exam = () => {
       const wrongIds = savedWrongAnswers.map((w) => w.questionId);
       const wrongQs = questionsData.filter((q) => wrongIds.includes(q.id));
       return shuffle(wrongQs).slice(0, TOTAL_QUESTIONS);
+    }
+
+    // Traffic sign exam: only traffic sign questions
+    if (isTrafficSignExam) {
+      const trafficSignQs = questionsData.filter((q) => q.isTrafficSign);
+      return shuffle(trafficSignQs).slice(0, TOTAL_QUESTIONS);
+    }
+
+    // Diem liet exam: only diem liet questions
+    if (isDiemLietExam) {
+      const diemLietQs = questionsData.filter((q) => q.isDiemLiet);
+      return shuffle(diemLietQs).slice(0, TOTAL_QUESTIONS);
     }
 
     // Full exam: all questions shuffled
@@ -152,6 +166,8 @@ const Exam = () => {
     const actualTotalQuestions = examQuestions.length;
     const isPassed = isWrongExam
       ? correctCount === actualTotalQuestions
+      : isDiemLietExam
+      ? correctCount === actualTotalQuestions
       : correctCount >= 21 && diemLietWrongCount === 0;
     setHasDiemLietWrong(diemLietWrongCount > 0);
 
@@ -208,6 +224,10 @@ const Exam = () => {
       ? "full"
       : isWrongExam
       ? "wrong"
+      : isTrafficSignExam
+      ? "trafficSign"
+      : isDiemLietExam
+      ? "diemLiet"
       : isSpeedExam
       ? "speed"
       : "default";
@@ -292,6 +312,10 @@ const Exam = () => {
               ? "Thi full bộ đề"
               : isWrongExam
               ? "Thi các câu đã sai"
+              : isTrafficSignExam
+              ? "Thi biển báo"
+              : isDiemLietExam
+              ? "Thi câu điểm liệt"
               : isSpeedExam
               ? "Thi tốc độ 25 câu"
               : "Bài thi thử bằng lái xe A1"}
@@ -314,11 +338,23 @@ const Exam = () => {
                   </strong>
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                  • Điểm đạt: <strong>≥ 21 câu đúng</strong>
+                  • Điểm đạt: <strong>{isDiemLietExam ? "Đúng tất cả câu" : "≥ 21 câu đúng"}</strong>
                 </Typography>
-                <Typography variant="body1" sx={{ mb: 2 }}>
-                  • Yêu cầu: <strong>Không được sai câu điểm liệt</strong>
-                </Typography>
+                {!isTrafficSignExam && !isDiemLietExam && (
+                  <Typography variant="body1" sx={{ mb: 2 }}>
+                    • Yêu cầu: <strong>Không được sai câu điểm liệt</strong>
+                  </Typography>
+                )}
+                {isTrafficSignExam && (
+                  <Typography variant="body1" sx={{ mb: 2 }}>
+                    • Nội dung: <strong>Chỉ các câu hỏi về biển báo giao thông</strong>
+                  </Typography>
+                )}
+                {isDiemLietExam && (
+                  <Typography variant="body1" sx={{ mb: 2 }}>
+                    • Nội dung: <strong>Chỉ 20 câu điểm liệt quan trọng</strong>
+                  </Typography>
+                )}
               </>
             )}
           </Box>
@@ -327,6 +363,8 @@ const Exam = () => {
             <Typography variant="body2">
               <strong>Lưu ý:</strong> Bài thi sẽ tự động kết thúc khi hết thời
               gian. Hãy đảm bảo trả lời tất cả câu hỏi trước khi hết giờ.
+              {isTrafficSignExam && " Bài thi này chỉ bao gồm các câu hỏi về biển báo giao thông."}
+              {isDiemLietExam && " Bài thi này chỉ bao gồm 20 câu điểm liệt quan trọng."}
             </Typography>
           </Alert>
 

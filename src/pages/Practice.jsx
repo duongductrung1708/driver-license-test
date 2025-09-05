@@ -91,6 +91,9 @@ const Practice = () => {
     } else if (practiceMode === "diemLiet") {
       // For diemLiet mode, select only diemLiet questions
       filtered = questionsData.filter((q) => q.isDiemLiet);
+    } else if (practiceMode === "trafficSign") {
+      // For trafficSign mode, select only traffic sign questions
+      filtered = questionsData.filter((q) => q.isTrafficSign);
     } else if (practiceMode === "wrong") {
       // Practice only wrong questions from state
       const wrongQuestionIds = wrongAnswers.map((w) => w.questionId);
@@ -104,6 +107,9 @@ const Practice = () => {
     switch (filter) {
       case "diemLiet":
         filtered = filtered.filter((q) => q.isDiemLiet);
+        break;
+      case "trafficSign":
+        filtered = filtered.filter((q) => q.isTrafficSign);
         break;
       case "wrong":
         {
@@ -308,6 +314,8 @@ const Practice = () => {
             ? "Ôn tập 25 câu"
             : practiceMode === "diemLiet"
             ? "Học câu điểm liệt"
+            : practiceMode === "trafficSign"
+            ? "Học biển báo"
             : practiceMode === "wrong"
             ? "Ôn tập các câu đã sai"
             : practiceMode === "custom"
@@ -337,6 +345,8 @@ const Practice = () => {
               ? "Chế độ ôn tập với 25 câu hỏi ngẫu nhiên từ bộ đề"
               : practiceMode === "diemLiet"
               ? "Chế độ học 20 câu điểm liệt quan trọng"
+              : practiceMode === "trafficSign"
+              ? "Chế độ học các câu hỏi về biển báo giao thông"
               : practiceMode === "wrong"
               ? "Luyện tập lại các câu bạn đã làm sai trước đó"
               : practiceMode === "custom"
@@ -415,6 +425,8 @@ const Practice = () => {
                   ? "25 câu ngẫu nhiên"
                   : practiceMode === "diemLiet"
                   ? "20 câu điểm liệt"
+                  : practiceMode === "trafficSign"
+                  ? `${filteredQuestions.length} câu biển báo`
                   : practiceMode === "custom"
                   ? `${customQuestionIds.length} câu tìm kiếm`
                   : questionsData.length}
@@ -426,6 +438,15 @@ const Practice = () => {
                   {practiceMode === "random"
                     ? "Trong 25 câu"
                     : questionsData.filter((q) => q.isDiemLiet).length}
+                  )
+                </MenuItem>
+              )}
+              {practiceMode !== "trafficSign" && practiceMode !== "custom" && (
+                <MenuItem value="trafficSign">
+                  Chỉ câu biển báo (
+                  {practiceMode === "random"
+                    ? "Trong 25 câu"
+                    : questionsData.filter((q) => q.isTrafficSign).length}
                   )
                 </MenuItem>
               )}
@@ -514,6 +535,8 @@ const Practice = () => {
             " Trong chế độ ôn tập 25 câu, các câu hỏi được chọn ngẫu nhiên từ bộ đề."}
           {practiceMode === "diemLiet" &&
             " Trong chế độ học câu điểm liệt, bạn sẽ học 20 câu hỏi quan trọng nhất."}
+          {practiceMode === "trafficSign" &&
+            " Trong chế độ học biển báo, bạn sẽ học các câu hỏi về biển báo giao thông."}
         </Typography>
       </Alert>
 
