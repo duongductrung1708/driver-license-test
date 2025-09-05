@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import {
   Container,
   Typography,
@@ -24,15 +24,21 @@ import {
   Download,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import questionsData from "../data/questions.json";
-import { ACHIEVEMENT_META, getUnlockedAchievements, getCurrentStreak } from "../components/achievements";
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import SearchQuestions from "../components/SearchQuestions";
-import ExamGoalSetter from "../components/ExamGoalSetter";
-import AchievementNotification from "../components/AchievementNotification";
+import {
+  ACHIEVEMENT_META,
+  getUnlockedAchievements,
+  getCurrentStreak,
+} from "../components/achievements";
 import SoundControl from "../components/SoundControl";
 import { useSound } from "../context/SoundContext";
+import FacebookSkeleton from "../components/FacebookSkeleton";
+const SearchQuestions = React.lazy(() =>
+  import("../components/SearchQuestions")
+);
+const ExamGoalSetter = React.lazy(() => import("../components/ExamGoalSetter"));
+const AchievementNotification = React.lazy(() =>
+  import("../components/AchievementNotification")
+);
 
 const Home = () => {
   const navigate = useNavigate();
@@ -43,6 +49,8 @@ const Home = () => {
   const [streakCount, setStreakCount] = useState(0);
   const [newAchievement, setNewAchievement] = useState(null);
   const [wrongCount, setWrongCount] = useState(0);
+  const [totalQuestions, setTotalQuestions] = useState(0);
+  const [diemLietCount, setDiemLietCount] = useState(0);
 
   // Load exam history from localStorage
   useEffect(() => {
@@ -54,6 +62,25 @@ const Home = () => {
     setWrongCount(Array.isArray(savedWrong) ? savedWrong.length : 0);
   }, []);
 
+  // Load questions metadata (counts) lazily
+  useEffect(() => {
+    (async () => {
+      try {
+        const { default: data } = await import("../data/questions.json");
+        const isArray = Array.isArray(data);
+        const total = isArray ? data.length : 0;
+        const dl = isArray
+          ? data.filter((q) => q.isDiemLiet === true).length
+          : 0;
+        setTotalQuestions(total);
+        setDiemLietCount(dl);
+      } catch (_) {
+        setTotalQuestions(0);
+        setDiemLietCount(0);
+      }
+    })();
+  }, []);
+
   // Check for new achievements from exam history
   useEffect(() => {
     if (examHistory.length > 0) {
@@ -62,7 +89,7 @@ const Home = () => {
         // Show the first new achievement
         setNewAchievement(latestExam.newAchievements[0]);
         // Remove the newAchievements flag to prevent showing again
-        const updatedHistory = examHistory.map((exam, index) => 
+        const updatedHistory = examHistory.map((exam, index) =>
           index === 0 ? { ...exam, newAchievements: undefined } : exam
         );
         localStorage.setItem("examHistory", JSON.stringify(updatedHistory));
@@ -105,73 +132,79 @@ const Home = () => {
   };
 
   // Hàm tạo và tải về PDF 20 câu điểm liệt
-  const handleDownloadDiemLiet = () => {
+  const handleDownloadDiemLiet = async () => {
     playClickSound();
-    const diemLietQuestions = questionsData.filter(q => q.isDiemLiet === true);
-    
+    const { default: questionsData } = await import("../data/questions.json");
+    const diemLietQuestions = questionsData.filter(
+      (q) => q.isDiemLiet === true
+    );
+
+    const { default: jsPDF } = await import("jspdf");
+    await import("jspdf-autotable");
     const doc = new jsPDF();
-    
+
     // Thiết lập font mặc định (có hỗ trợ Unicode tốt hơn)
-    doc.setFont('helvetica');
-    
+    doc.setFont("helvetica");
+
     // Tiêu đề
     doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    const titleText = '20 CAU DIEM LIET - THI BANG LAI XE';
+    doc.setFont(undefined, "bold");
+    const titleText = "20 CAU DIEM LIET - THI BANG LAI XE";
     const titleLines = doc.splitTextToSize(titleText, 180);
-    doc.text(titleLines, 105, 20, { align: 'center' });
-    
+    doc.text(titleLines, 105, 20, { align: "center" });
+
     // Cảnh báo
     doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
+    doc.setFont(undefined, "bold");
     doc.setTextColor(255, 0, 0);
-    const warningText = 'CANH BAO: Sai 1 cau diem liet = Truot ngay lap tuc!';
+    const warningText = "CANH BAO: Sai 1 cau diem liet = Truot ngay lap tuc!";
     const warningLines = doc.splitTextToSize(warningText, 180);
-    doc.text(warningLines, 105, 30, { align: 'center' });
-    
+    doc.text(warningLines, 105, 30, { align: "center" });
+
     let yPosition = 40;
     doc.setTextColor(0, 0, 0);
-    
+
     diemLietQuestions.forEach((question, index) => {
       // Kiểm tra nếu cần thêm trang mới
       if (yPosition > 250) {
         doc.addPage();
         yPosition = 20;
       }
-      
+
       // Số câu hỏi
       doc.setFontSize(10);
-      doc.setFont(undefined, 'bold');
+      doc.setFont(undefined, "bold");
       const questionText = `${index + 1}. ${question.question}`;
       const questionLines = doc.splitTextToSize(questionText, 160);
       doc.text(questionLines, 20, yPosition);
       yPosition += questionLines.length * 6 + 5;
-      
+
       // Hình ảnh (nếu có)
       if (question.image) {
         doc.setFontSize(8);
-        doc.setFont(undefined, 'normal');
+        doc.setFont(undefined, "normal");
         doc.setTextColor(100, 100, 100);
         const imageText = `[Hinh anh: ${question.image}]`;
         const imageLines = doc.splitTextToSize(imageText, 160);
         doc.text(imageLines, 25, yPosition);
         yPosition += imageLines.length * 5 + 3;
       }
-      
+
       // Các đáp án
       doc.setFontSize(9);
-      doc.setFont(undefined, 'normal');
+      doc.setFont(undefined, "normal");
       doc.setTextColor(0, 0, 0);
       question.answers.forEach((answer, ansIndex) => {
         const marker = ansIndex === question.correctAnswer ? "✓" : "○";
         const answerText = `${marker} ${answer}`;
         const answerLines = doc.splitTextToSize(answerText, 150);
-        const color = ansIndex === question.correctAnswer ? [0, 128, 0] : [0, 0, 0];
+        const color =
+          ansIndex === question.correctAnswer ? [0, 128, 0] : [0, 0, 0];
         doc.setTextColor(...color);
         doc.text(answerLines, 30, yPosition);
         yPosition += answerLines.length * 5 + 3;
       });
-      
+
       // Giải thích
       doc.setTextColor(0, 0, 128);
       const explanationText = `Giai thich: ${question.explanation}`;
@@ -179,70 +212,76 @@ const Home = () => {
       doc.text(explanationLines, 25, yPosition);
       yPosition += explanationLines.length * 5 + 8;
     });
-    
-    doc.save('20-cau-diem-liet.pdf');
+
+    doc.save("20-cau-diem-liet.pdf");
     playSuccessSound();
   };
 
   // Hàm tạo và tải về PDF 250 câu hỏi
-  const handleDownloadFullQuestions = () => {
+  const handleDownloadFullQuestions = async () => {
     playClickSound();
+    const { default: jsPDF } = await import("jspdf");
+    await import("jspdf-autotable");
     const doc = new jsPDF();
-    
+
     // Thiết lập font mặc định (có hỗ trợ Unicode tốt hơn)
-    doc.setFont('helvetica');
-    
+    doc.setFont("helvetica");
+
     // Tiêu đề
     doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    const titleText = 'BO DE 250 CAU HOI THI BANG LAI XE';
+    doc.setFont(undefined, "bold");
+    const titleText = "BO DE 250 CAU HOI THI BANG LAI XE";
     const titleLines = doc.splitTextToSize(titleText, 180);
-    doc.text(titleLines, 105, 20, { align: 'center' });
-    
+    doc.text(titleLines, 105, 20, { align: "center" });
+
     let yPosition = 35;
     doc.setTextColor(0, 0, 0);
-    
+
+    const { default: questionsData } = await import("../data/questions.json");
     questionsData.forEach((question, index) => {
       // Kiểm tra nếu cần thêm trang mới
       if (yPosition > 250) {
         doc.addPage();
         yPosition = 20;
       }
-      
+
       // Số câu hỏi và nội dung
       doc.setFontSize(10);
-      doc.setFont(undefined, 'bold');
+      doc.setFont(undefined, "bold");
       const diemLietMarker = question.isDiemLiet ? " [DIEM LIET]" : "";
-      const questionText = `${index + 1}. ${question.question}${diemLietMarker}`;
+      const questionText = `${index + 1}. ${
+        question.question
+      }${diemLietMarker}`;
       const questionLines = doc.splitTextToSize(questionText, 160);
       doc.text(questionLines, 20, yPosition);
       yPosition += questionLines.length * 6 + 5;
-      
+
       // Hình ảnh (nếu có)
       if (question.image) {
         doc.setFontSize(8);
-        doc.setFont(undefined, 'normal');
+        doc.setFont(undefined, "normal");
         doc.setTextColor(100, 100, 100);
         const imageText = `[Hinh anh: ${question.image}]`;
         const imageLines = doc.splitTextToSize(imageText, 160);
         doc.text(imageLines, 25, yPosition);
         yPosition += imageLines.length * 5 + 3;
       }
-      
+
       // Các đáp án
       doc.setFontSize(9);
-      doc.setFont(undefined, 'normal');
+      doc.setFont(undefined, "normal");
       doc.setTextColor(0, 0, 0);
       question.answers.forEach((answer, ansIndex) => {
         const marker = ansIndex === question.correctAnswer ? "✓" : "○";
         const answerText = `${marker} ${answer}`;
         const answerLines = doc.splitTextToSize(answerText, 150);
-        const color = ansIndex === question.correctAnswer ? [0, 128, 0] : [0, 0, 0];
+        const color =
+          ansIndex === question.correctAnswer ? [0, 128, 0] : [0, 0, 0];
         doc.setTextColor(...color);
         doc.text(answerLines, 30, yPosition);
         yPosition += answerLines.length * 5 + 3;
       });
-      
+
       // Giải thích
       doc.setTextColor(0, 0, 128);
       const explanationText = `Giai thich: ${question.explanation}`;
@@ -250,12 +289,10 @@ const Home = () => {
       doc.text(explanationLines, 25, yPosition);
       yPosition += explanationLines.length * 5 + 8;
     });
-    
-    doc.save('250-cau-hoi-thi-bang-lai.pdf');
+
+    doc.save("250-cau-hoi-thi-bang-lai.pdf");
     playSuccessSound();
   };
-
-
 
   const features = [
     {
@@ -266,7 +303,7 @@ const Home = () => {
         playClickSound();
         navigate("/practice", { state: { mode: "random" } });
       },
-      buttonColor: 'primary',
+      buttonColor: "primary",
     },
     {
       icon: <School sx={{ fontSize: 40, color: "warning.main" }} />,
@@ -276,19 +313,20 @@ const Home = () => {
         playClickSound();
         navigate("/practice", { state: { mode: "full" } });
       },
-      buttonColor: 'warning',
+      buttonColor: "warning",
     },
     {
       icon: <History sx={{ fontSize: 40, color: "secondary.main" }} />,
       title: `Ôn tập các câu sai (${wrongCount})`,
-      description: wrongCount > 0 
-        ? "Luyện tập lại những câu bạn đã làm sai"
-        : "Bạn chưa có câu hỏi nào sai. Hãy làm bài thi thử trước.",
+      description:
+        wrongCount > 0
+          ? "Luyện tập lại những câu bạn đã làm sai"
+          : "Bạn chưa có câu hỏi nào sai. Hãy làm bài thi thử trước.",
       action: () => {
         playClickSound();
         navigate("/practice", { state: { mode: "wrong" } });
       },
-      buttonColor: 'secondary',
+      buttonColor: "secondary",
       disabled: wrongCount === 0,
     },
     {
@@ -299,7 +337,7 @@ const Home = () => {
         playClickSound();
         navigate("/practice", { state: { mode: "diemLiet" } });
       },
-      buttonColor: 'error',
+      buttonColor: "error",
     },
     {
       icon: <Quiz sx={{ fontSize: 40, color: "success.main" }} />,
@@ -309,7 +347,7 @@ const Home = () => {
         playClickSound();
         navigate("/exam");
       },
-      buttonColor: 'success',
+      buttonColor: "success",
     },
     {
       icon: <Quiz sx={{ fontSize: 40, color: "info.main" }} />,
@@ -319,19 +357,20 @@ const Home = () => {
         playClickSound();
         navigate("/exam", { state: { mode: "full" } });
       },
-      buttonColor: 'info',
+      buttonColor: "info",
     },
     {
       icon: <Quiz sx={{ fontSize: 40, color: "secondary.main" }} />,
       title: `Thi các câu đã sai (${wrongCount})`,
-      description: wrongCount > 0 
-        ? "Thi lại dựa trên danh sách câu sai"
-        : "Bạn chưa có câu hỏi nào sai. Hãy làm bài thi thử trước.",
+      description:
+        wrongCount > 0
+          ? "Thi lại dựa trên danh sách câu sai"
+          : "Bạn chưa có câu hỏi nào sai. Hãy làm bài thi thử trước.",
       action: () => {
         playClickSound();
         navigate("/exam", { state: { mode: "wrong" } });
       },
-      buttonColor: 'secondary',
+      buttonColor: "secondary",
       disabled: wrongCount === 0,
     },
     {
@@ -342,7 +381,7 @@ const Home = () => {
         playClickSound();
         navigate("/exam", { state: { mode: "speed" } });
       },
-      buttonColor: 'warning',
+      buttonColor: "warning",
     },
   ];
 
@@ -408,7 +447,9 @@ const Home = () => {
       </Paper>
 
       {/* Đặt mục tiêu ngày thi */}
-      <ExamGoalSetter />
+      <Suspense fallback={<FacebookSkeleton lines={2} />}>
+        <ExamGoalSetter />
+      </Suspense>
 
       {/* Thành tích & Huy hiệu */}
       <Paper sx={{ p: 3, mb: 4, backgroundColor: "background.default" }}>
@@ -420,32 +461,39 @@ const Home = () => {
           Thành tích & Huy hiệu 🏆
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-          <Chip label={`Chuỗi ngày liên tiếp: ${streakCount}`} color={streakCount >= 1 ? "primary" : "default"} />
+          <Chip
+            label={`Chuỗi ngày liên tiếp: ${streakCount}`}
+            color={streakCount >= 1 ? "primary" : "default"}
+          />
         </Box>
         <Box
           sx={{
-            display: 'grid',
+            display: "grid",
             gridTemplateColumns: {
-              xs: 'repeat(4, 1fr)',
-              sm: 'repeat(6, 1fr)',
-              md: 'repeat(8, 1fr)',
-              lg: 'repeat(10, 1fr)'
+              xs: "repeat(4, 1fr)",
+              sm: "repeat(6, 1fr)",
+              md: "repeat(8, 1fr)",
+              lg: "repeat(10, 1fr)",
             },
             gap: 2,
-            alignItems: 'center',
-            justifyItems: 'center'
+            alignItems: "center",
+            justifyItems: "center",
           }}
         >
           {Object.keys(ACHIEVEMENT_META).map((id) => {
             const meta = ACHIEVEMENT_META[id];
             const isUnlocked = unlockedAchievements.includes(id);
             return (
-              <Tooltip 
+              <Tooltip
                 key={id}
                 title={
                   <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{meta.title}</Typography>
-                    <Typography variant="caption" color="text.secondary">{meta.description}</Typography>
+                    <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                      {meta.title}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {meta.description}
+                    </Typography>
                   </Box>
                 }
                 arrow
@@ -454,20 +502,27 @@ const Home = () => {
                   sx={{
                     width: 64,
                     height: 64,
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '1px solid',
-                    borderColor: isUnlocked ? 'primary.main' : 'divider',
-                    color: isUnlocked ? 'primary.main' : 'text.disabled',
-                    backgroundColor: isUnlocked ? 'action.hover' : 'background.paper',
-                    transition: 'transform 0.2s ease',
-                    cursor: 'default',
-                    '&:hover': { transform: 'translateY(-2px)' }
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid",
+                    borderColor: isUnlocked ? "primary.main" : "divider",
+                    color: isUnlocked ? "primary.main" : "text.disabled",
+                    backgroundColor: isUnlocked
+                      ? "action.hover"
+                      : "background.paper",
+                    transition: "transform 0.2s ease",
+                    cursor: "default",
+                    "&:hover": { transform: "translateY(-2px)" },
                   }}
                 >
-                  <Typography component="span" sx={{ fontSize: 28, lineHeight: 1 }}>{meta.icon}</Typography>
+                  <Typography
+                    component="span"
+                    sx={{ fontSize: 28, lineHeight: 1 }}
+                  >
+                    {meta.icon}
+                  </Typography>
                 </Box>
               </Tooltip>
             );
@@ -476,10 +531,17 @@ const Home = () => {
       </Paper>
 
       {/* Tìm kiếm câu hỏi */}
-      <SearchQuestions />
+      <Suspense fallback={<FacebookSkeleton lines={4} />}>
+        <SearchQuestions />
+      </Suspense>
 
       {/* Các chế độ học */}
-      <Grid container spacing={{lg: 4, md: 4, sm: 5, xs: 4}} alignItems="stretch" sx={{ mb: 6 }}>
+      <Grid
+        container
+        spacing={{ lg: 4, md: 4, sm: 5, xs: 4 }}
+        alignItems="stretch"
+        sx={{ mb: 6 }}
+      >
         {features.map((feature, index) => (
           <Grid item xs={12} sm={6} md={3} key={index} sx={{ display: "flex" }}>
             <Card
@@ -487,14 +549,16 @@ const Home = () => {
               style={{ animationDelay: `${index * 0.2}s` }}
               sx={{
                 height: "100%",
-                width: {lg: "22.5rem", sm: "28.5rem", xs: "25rem"},
+                width: { lg: "22.5rem", sm: "28.5rem", xs: "25rem" },
                 display: "flex",
                 flexDirection: "column",
                 cursor: feature.disabled ? "not-allowed" : "pointer",
                 opacity: feature.disabled ? 0.6 : 1,
                 "&:hover": {
                   transform: feature.disabled ? "none" : "translateY(-8px)",
-                  boxShadow: feature.disabled ? "none" : "0 8px 25px rgba(0, 0, 0, 0.15)",
+                  boxShadow: feature.disabled
+                    ? "none"
+                    : "0 8px 25px rgba(0, 0, 0, 0.15)",
                 },
               }}
               onClick={feature.disabled ? undefined : feature.action}
@@ -549,13 +613,17 @@ const Home = () => {
                   disabled={feature.disabled}
                   sx={{
                     minWidth: 120,
-                    backgroundColor: feature.disabled ? 'grey.400' : `${feature.buttonColor}.main`,
+                    backgroundColor: feature.disabled
+                      ? "grey.400"
+                      : `${feature.buttonColor}.main`,
                     "&:hover": {
-                      backgroundColor: feature.disabled ? 'grey.400' : `${feature.buttonColor}.dark`,
+                      backgroundColor: feature.disabled
+                        ? "grey.400"
+                        : `${feature.buttonColor}.dark`,
                     },
                   }}
                 >
-                  {feature.disabled ? 'Không khả dụng' : 'Bắt đầu'}
+                  {feature.disabled ? "Không khả dụng" : "Bắt đầu"}
                 </Button>
               </CardContent>
             </Card>
@@ -575,7 +643,7 @@ const Home = () => {
                 variant="h4"
                 sx={{ fontWeight: "bold", color: "primary.main" }}
               >
-                250
+                {totalQuestions}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Tổng số câu hỏi
@@ -588,7 +656,7 @@ const Home = () => {
                 variant="h4"
                 sx={{ fontWeight: "bold", color: "error.main" }}
               >
-                {questionsData.filter((q) => q.isDiemLiet).length}
+                {diemLietCount}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Câu điểm liệt
@@ -601,7 +669,7 @@ const Home = () => {
                 variant="h4"
                 sx={{ fontWeight: "bold", color: "success.main" }}
               >
-                230
+                {Math.max(totalQuestions - diemLietCount, 0)}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Câu thường
@@ -613,7 +681,11 @@ const Home = () => {
 
       {/* Tải tài liệu học tập */}
       <Paper sx={{ p: 3, mb: 4, backgroundColor: "background.default" }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: "bold", mb: 3 }}>
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{ fontWeight: "bold", mb: 3 }}
+        >
           📥 Tải tài liệu học tập
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
@@ -635,13 +707,26 @@ const Home = () => {
             >
               <CardContent sx={{ textAlign: "center", p: 3 }}>
                 <Download sx={{ fontSize: 60, color: "error.main", mb: 2 }} />
-                <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: "bold" }}>
+                <Typography
+                  variant="h6"
+                  component="h3"
+                  gutterBottom
+                  sx={{ fontWeight: "bold" }}
+                >
                   20 CÂU ĐIỂM LIỆT
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   Tải về bộ tài liệu 20 câu điểm liệt quan trọng
                 </Typography>
-                <Typography variant="caption" color="error.main" sx={{ fontWeight: "bold" }}>
+                <Typography
+                  variant="caption"
+                  color="error.main"
+                  sx={{ fontWeight: "bold" }}
+                >
                   ⚠️ Cảnh báo: Sai 1 câu điểm liệt = Trượt ngay lập tức!
                 </Typography>
               </CardContent>
@@ -662,13 +747,26 @@ const Home = () => {
             >
               <CardContent sx={{ textAlign: "center", p: 3 }}>
                 <Download sx={{ fontSize: 60, color: "primary.main", mb: 2 }} />
-                <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: "bold" }}>
+                <Typography
+                  variant="h6"
+                  component="h3"
+                  gutterBottom
+                  sx={{ fontWeight: "bold" }}
+                >
                   BỘ ĐỀ 250 CÂU HỎI
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
                   Tải về toàn bộ bộ đề 250 câu hỏi thi bằng lái xe
                 </Typography>
-                <Typography variant="caption" color="primary.main" sx={{ fontWeight: "bold" }}>
+                <Typography
+                  variant="caption"
+                  color="primary.main"
+                  sx={{ fontWeight: "bold" }}
+                >
                   📚 Bao gồm cả câu điểm liệt và câu thường
                 </Typography>
               </CardContent>
@@ -691,16 +789,16 @@ const Home = () => {
             Lịch sử thi thử
           </Typography>
           <Box sx={{ display: "flex", gap: 1 }}>
-                         <Button
-               variant="outlined"
-               startIcon={<History />}
-               onClick={() => {
-                 playClickSound();
-                 setShowHistory(!showHistory);
-               }}
-             >
-               {showHistory ? "Ẩn lịch sử" : "Xem lịch sử"}
-             </Button>
+            <Button
+              variant="outlined"
+              startIcon={<History />}
+              onClick={() => {
+                playClickSound();
+                setShowHistory(!showHistory);
+              }}
+            >
+              {showHistory ? "Ẩn lịch sử" : "Xem lịch sử"}
+            </Button>
             <Button
               variant="outlined"
               color="error"
@@ -854,14 +952,16 @@ const Home = () => {
       </Paper>
 
       {/* Achievement Notification */}
-      {newAchievement && (
-        <AchievementNotification
-          achievementId={newAchievement}
-          onClose={handleAchievementClose}
-        />
-      )}
+      <Suspense fallback={<FacebookSkeleton lines={1} withAvatar={false} />}>
+        {newAchievement && (
+          <AchievementNotification
+            achievementId={newAchievement}
+            onClose={handleAchievementClose}
+          />
+        )}
+      </Suspense>
       <SoundControl />
-      
+
       {/* Footer */}
       <Box
         component="footer"
@@ -869,33 +969,36 @@ const Home = () => {
           mt: 8,
           py: 3,
           px: 2,
-          backgroundColor: 'background.paper',
-          borderTop: '1px solid',
-          borderColor: 'divider',
-          textAlign: 'center',
+          backgroundColor: "background.paper",
+          borderTop: "1px solid",
+          borderColor: "divider",
+          textAlign: "center",
         }}
       >
         <Container maxWidth="lg">
           <Typography variant="body2" color="text.secondary">
-            © 2025 Ôn Thi Bằng Lái Xe Online. Phát triển bởi{' '}
+            © 2025 Ôn Thi Bằng Lái Xe Online. Phát triển bởi{" "}
             <Typography
               component="span"
               variant="body2"
               sx={{
-                fontWeight: 'bold',
-                color: 'primary.main',
-                fontStyle: 'italic',
+                fontWeight: "bold",
+                color: "primary.main",
+                fontStyle: "italic",
               }}
             >
               HanKoonE
             </Typography>
           </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ mt: 1, display: "block" }}
+          >
             Hệ thống ôn tập và thi thử bằng lái xe máy A1 với 250 câu hỏi mẫu
           </Typography>
         </Container>
       </Box>
-
     </Container>
   );
 };

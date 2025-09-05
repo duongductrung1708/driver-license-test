@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   IconButton,
   Tooltip,
@@ -6,15 +6,15 @@ import {
   Typography,
   Slider,
   Button,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Brightness4,
   Brightness7,
   ZoomIn,
   ZoomOut,
   RestartAlt,
-} from '@mui/icons-material';
-import { useTheme } from '../context/ThemeContext';
+} from "@mui/icons-material";
+import { useTheme } from "../context/ThemeContext";
 
 const ThemeToggle = () => {
   const {
@@ -34,14 +34,14 @@ const ThemeToggle = () => {
   return (
     <Box
       sx={{
-        position: 'fixed',
+        position: "fixed",
         top: 16,
         right: 16,
         zIndex: 1000,
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
         gap: 1,
-        backgroundColor: 'background.paper',
+        backgroundColor: "background.paper",
         borderRadius: 2,
         p: 2,
         boxShadow: 3,
@@ -49,25 +49,27 @@ const ThemeToggle = () => {
       }}
     >
       {/* Theme Toggle */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Tooltip title={darkMode ? 'Chuyển sang Light Mode' : 'Chuyển sang Dark Mode'}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Tooltip
+          title={darkMode ? "Chuyển sang Light Mode" : "Chuyển sang Dark Mode"}
+        >
           <IconButton onClick={toggleDarkMode} color="inherit">
             {darkMode ? <Brightness7 /> : <Brightness4 />}
           </IconButton>
         </Tooltip>
         <Typography variant="body2">
-          {darkMode ? 'Dark Mode' : 'Light Mode'}
+          {darkMode ? "Dark Mode" : "Light Mode"}
         </Typography>
       </Box>
 
       {/* Font Size Controls */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <Tooltip title="Giảm cỡ chữ">
           <IconButton onClick={decreaseFontSize} color="inherit" size="small">
             <ZoomOut />
           </IconButton>
         </Tooltip>
-        <Typography variant="body2" sx={{ minWidth: 40, textAlign: 'center' }}>
+        <Typography variant="body2" sx={{ minWidth: 40, textAlign: "center" }}>
           {fontSize}px
         </Typography>
         <Tooltip title="Tăng cỡ chữ">
@@ -78,7 +80,7 @@ const ThemeToggle = () => {
       </Box>
 
       {/* Font Size Slider */}
-      <Box sx={{ width: '100%', mt: 1 }}>
+      <Box sx={{ width: "100%", mt: 1 }}>
         <Slider
           value={fontSize}
           onChange={handleFontSizeChange}

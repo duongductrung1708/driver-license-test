@@ -1,28 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Container, 
-  Typography, 
-  Button, 
-  Box, 
+import React, { useState } from "react";
+import {
+  Container,
+  Typography,
+  Button,
+  Box,
   Alert,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Paper
-} from '@mui/material';
-import { 
-  Home, 
-  Warning,
-  CheckCircle,
-  Cancel
-} from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import QuizQuestion from '../components/QuizQuestion';
-import ProgressBar from '../components/ProgressBar';
-import Timer from '../components/Timer';
-import questionsData from '../data/questions.json';
-import { evaluateAndUnlockAchievements } from '../components/achievements';
+  Paper,
+} from "@mui/material";
+import { Home } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import QuizQuestion from "../components/QuizQuestion";
+import ProgressBar from "../components/ProgressBar";
+import Timer from "../components/Timer";
+import questionsData from "../data/questions.json";
+import { evaluateAndUnlockAchievements } from "../components/achievements";
 
 const Exam = () => {
   const navigate = useNavigate();
@@ -32,15 +27,15 @@ const Exam = () => {
   const [isExamStarted, setIsExamStarted] = useState(false);
   const [isExamFinished, setIsExamFinished] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [wrongAnswers, setWrongAnswers] = useState([]);
   const [hasDiemLietWrong, setHasDiemLietWrong] = useState(false);
   const [examStartTime, setExamStartTime] = useState(null);
 
   // Support multiple exam modes via location.state
-  const urlParamsMode = typeof window !== 'undefined' && window.history?.state?.usr?.mode;
-  const isFullExam = urlParamsMode === 'full';
-  const isWrongExam = urlParamsMode === 'wrong';
-  const isSpeedExam = urlParamsMode === 'speed';
+  const urlParamsMode =
+    typeof window !== "undefined" && window.history?.state?.usr?.mode;
+  const isFullExam = urlParamsMode === "full";
+  const isWrongExam = urlParamsMode === "wrong";
+  const isSpeedExam = urlParamsMode === "speed";
 
   const EXAM_DURATION = isFullExam ? 190 * 60 : isSpeedExam ? 5 * 60 : 19 * 60; // seconds
   const TOTAL_QUESTIONS = isFullExam ? questionsData.length : 25;
@@ -52,9 +47,11 @@ const Exam = () => {
 
     // Wrong-only exam
     if (isWrongExam) {
-      const savedWrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
-      const wrongIds = savedWrongAnswers.map(w => w.questionId);
-      const wrongQs = questionsData.filter(q => wrongIds.includes(q.id));
+      const savedWrongAnswers = JSON.parse(
+        localStorage.getItem("wrongAnswers") || "[]"
+      );
+      const wrongIds = savedWrongAnswers.map((w) => w.questionId);
+      const wrongQs = questionsData.filter((q) => wrongIds.includes(q.id));
       return shuffle(wrongQs).slice(0, TOTAL_QUESTIONS);
     }
 
@@ -65,10 +62,13 @@ const Exam = () => {
 
     // Default (25-question exams): ensure 2 diem liet
     const DIEM_LIET_NEEDED = 2;
-    const diemLiet = questionsData.filter(q => q.isDiemLiet);
-    const nonDiemLiet = questionsData.filter(q => !q.isDiemLiet);
+    const diemLiet = questionsData.filter((q) => q.isDiemLiet);
+    const nonDiemLiet = questionsData.filter((q) => !q.isDiemLiet);
     const selectedDiemLiet = pick(diemLiet, DIEM_LIET_NEEDED);
-    const selectedNonDiemLiet = pick(nonDiemLiet, TOTAL_QUESTIONS - selectedDiemLiet.length);
+    const selectedNonDiemLiet = pick(
+      nonDiemLiet,
+      TOTAL_QUESTIONS - selectedDiemLiet.length
+    );
     return shuffle([...selectedDiemLiet, ...selectedNonDiemLiet]);
   };
 
@@ -85,10 +85,10 @@ const Exam = () => {
 
   const handleAnswerSelect = (answerIndex) => {
     if (isExamFinished) return;
-    
-    setAnswers(prev => ({
+
+    setAnswers((prev) => ({
       ...prev,
-      [currentQuestionIndex]: answerIndex
+      [currentQuestionIndex]: answerIndex,
     }));
   };
 
@@ -115,7 +115,7 @@ const Exam = () => {
       const userAnswer = answers[index];
       const isCorrect = userAnswer === question.correctAnswer;
       const isAnswered = userAnswer !== undefined;
-      
+
       if (isCorrect) {
         correctCount++;
       } else if (isAnswered) {
@@ -124,9 +124,9 @@ const Exam = () => {
           question: question.question,
           selectedAnswer: userAnswer,
           correctAnswer: question.correctAnswer,
-          isDiemLiet: question.isDiemLiet
+          isDiemLiet: question.isDiemLiet,
         });
-        
+
         if (question.isDiemLiet) {
           diemLietWrongCount++;
         }
@@ -144,46 +144,47 @@ const Exam = () => {
           correctAnswer: question.correctAnswer,
           isCorrect: isCorrect,
           isDiemLiet: question.isDiemLiet,
-          explanation: question.explanation
+          explanation: question.explanation,
         });
       }
     });
 
     const actualTotalQuestions = examQuestions.length;
     const isPassed = isWrongExam
-      ? (correctCount === actualTotalQuestions)
-      : (correctCount >= 21 && diemLietWrongCount === 0);
+      ? correctCount === actualTotalQuestions
+      : correctCount >= 21 && diemLietWrongCount === 0;
     setHasDiemLietWrong(diemLietWrongCount > 0);
 
     // Save wrong answers to localStorage (dedupe) and remove corrected ones
-    const existingWrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
-    const newWrongAnswers = wrongAnswersList.map(w => ({
+    const existingWrongAnswers = JSON.parse(
+      localStorage.getItem("wrongAnswers") || "[]"
+    );
+    const newWrongAnswers = wrongAnswersList.map((w) => ({
       questionId: w.questionId,
       selectedAnswer: w.selectedAnswer,
       correctAnswer: w.correctAnswer,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }));
 
     // Build sets for efficient operations
-    const newlyWrongIds = new Set(newWrongAnswers.map(w => w.questionId));
-    const allAnsweredIds = new Set(allAnswersList.map(a => a.questionId));
+    const newlyWrongIds = new Set(newWrongAnswers.map((w) => w.questionId));
     const answeredCorrectIds = new Set(
-      allAnswersList.filter(a => a.isCorrect).map(a => a.questionId)
+      allAnswersList.filter((a) => a.isCorrect).map((a) => a.questionId)
     );
 
     // 1) Remove any previously wrong questions that were answered correctly now
     const keptOldWrong = existingWrongAnswers.filter(
-      w => !answeredCorrectIds.has(w.questionId)
+      (w) => !answeredCorrectIds.has(w.questionId)
     );
 
     // 2) Deduplicate: remove old entries for questions that are newly wrong in this exam
     const dedupOldWrong = keptOldWrong.filter(
-      w => !newlyWrongIds.has(w.questionId)
+      (w) => !newlyWrongIds.has(w.questionId)
     );
 
     // 3) Combine
     const updatedWrongAnswers = [...dedupOldWrong, ...newWrongAnswers];
-    localStorage.setItem('wrongAnswers', JSON.stringify(updatedWrongAnswers));
+    localStorage.setItem("wrongAnswers", JSON.stringify(updatedWrongAnswers));
 
     // Save exam history to localStorage
     const examResult = {
@@ -195,13 +196,21 @@ const Exam = () => {
       totalQuestions: actualTotalQuestions,
       isPassed,
       hasDiemLietWrong: diemLietWrongCount > 0,
-      diemLietWrongCount
+      diemLietWrongCount,
     };
 
     // Compute duration & mode for achievements
     const finishedAt = new Date();
-    const durationSeconds = examStartTime ? Math.max(0, Math.floor((finishedAt - examStartTime) / 1000)) : undefined;
-    const mode = isFullExam ? 'full' : isWrongExam ? 'wrong' : isSpeedExam ? 'speed' : 'default';
+    const durationSeconds = examStartTime
+      ? Math.max(0, Math.floor((finishedAt - examStartTime) / 1000))
+      : undefined;
+    const mode = isFullExam
+      ? "full"
+      : isWrongExam
+      ? "wrong"
+      : isSpeedExam
+      ? "speed"
+      : "default";
 
     // Evaluate and unlock achievements
     const achievementResult = evaluateAndUnlockAchievements({
@@ -214,19 +223,21 @@ const Exam = () => {
       durationSeconds,
       finishedAtISOString: finishedAt.toISOString(),
       hasDiemLietWrong: diemLietWrongCount > 0,
-      diemLietWrongCount
+      diemLietWrongCount,
     });
 
     // Add newly unlocked achievements to exam result
     examResult.newAchievements = achievementResult.newlyUnlocked;
 
     // Save exam history to localStorage (after attaching new achievements)
-    const existingHistory = JSON.parse(localStorage.getItem('examHistory') || '[]');
+    const existingHistory = JSON.parse(
+      localStorage.getItem("examHistory") || "[]"
+    );
     const updatedHistory = [examResult, ...existingHistory];
-    localStorage.setItem('examHistory', JSON.stringify(updatedHistory));
+    localStorage.setItem("examHistory", JSON.stringify(updatedHistory));
 
     // Navigate to result page with data
-    navigate('/result', {
+    navigate("/result", {
       state: {
         totalQuestions: actualTotalQuestions,
         correctCount,
@@ -238,8 +249,8 @@ const Exam = () => {
         hasDiemLietWrong: diemLietWrongCount > 0,
         diemLietWrongCount,
         mode,
-        newlyUnlockedAchievements: achievementResult.newlyUnlocked
-      }
+        newlyUnlockedAchievements: achievementResult.newlyUnlocked,
+      },
     });
   };
 
@@ -255,24 +266,37 @@ const Exam = () => {
   if (!isExamStarted) {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
+          <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
             Thi thử
           </Typography>
-          <Button 
-            variant="outlined" 
+          <Button
+            variant="outlined"
             startIcon={<Home />}
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
           >
             Về trang chủ
           </Button>
         </Box>
 
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
-            {isFullExam ? 'Thi full bộ đề' : isWrongExam ? 'Thi các câu đã sai' : isSpeedExam ? 'Thi tốc độ 25 câu' : 'Bài thi thử bằng lái xe A1'}
+        <Paper sx={{ p: 4, textAlign: "center" }}>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: "bold" }}>
+            {isFullExam
+              ? "Thi full bộ đề"
+              : isWrongExam
+              ? "Thi các câu đã sai"
+              : isSpeedExam
+              ? "Thi tốc độ 25 câu"
+              : "Bài thi thử bằng lái xe A1"}
           </Typography>
-          
+
           <Box sx={{ my: 4 }}>
             {!isWrongExam && (
               <>
@@ -280,7 +304,14 @@ const Exam = () => {
                   • Số câu hỏi: <strong>{TOTAL_QUESTIONS} câu</strong>
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                  • Thời gian: <strong>{isFullExam ? '190 phút' : isSpeedExam ? '5 phút' : '19 phút'}</strong>
+                  • Thời gian:{" "}
+                  <strong>
+                    {isFullExam
+                      ? "190 phút"
+                      : isSpeedExam
+                      ? "5 phút"
+                      : "19 phút"}
+                  </strong>
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 2 }}>
                   • Điểm đạt: <strong>≥ 21 câu đúng</strong>
@@ -294,18 +325,18 @@ const Exam = () => {
 
           <Alert severity="info" sx={{ mb: 3 }}>
             <Typography variant="body2">
-              <strong>Lưu ý:</strong> Bài thi sẽ tự động kết thúc khi hết thời gian. 
-              Hãy đảm bảo trả lời tất cả câu hỏi trước khi hết giờ.
+              <strong>Lưu ý:</strong> Bài thi sẽ tự động kết thúc khi hết thời
+              gian. Hãy đảm bảo trả lời tất cả câu hỏi trước khi hết giờ.
             </Typography>
           </Alert>
 
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             size="large"
             onClick={startExam}
-            sx={{ 
-              backgroundColor: 'success.main',
-              '&:hover': { backgroundColor: 'success.dark' }
+            sx={{
+              backgroundColor: "success.main",
+              "&:hover": { backgroundColor: "success.dark" },
             }}
           >
             Bắt đầu thi
@@ -318,12 +349,19 @@ const Exam = () => {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
+        <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
           Thi thử
         </Typography>
-        <Button 
-          variant="outlined" 
+        <Button
+          variant="outlined"
           startIcon={<Home />}
           onClick={() => setShowConfirmDialog(true)}
         >
@@ -332,15 +370,15 @@ const Exam = () => {
       </Box>
 
       {/* Timer */}
-      <Timer 
+      <Timer
         duration={EXAM_DURATION}
         onTimeUp={handleTimeUp}
         isRunning={!isExamFinished}
       />
 
       {/* Progress Bar */}
-      <ProgressBar 
-        current={currentQuestionIndex + 1} 
+      <ProgressBar
+        current={currentQuestionIndex + 1}
         total={examQuestions.length}
         answeredCount={answeredCount}
       />
@@ -358,7 +396,7 @@ const Exam = () => {
       )}
 
       {/* Navigation Buttons */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
         <Button
           variant="outlined"
           onClick={handlePrevious}
@@ -367,7 +405,7 @@ const Exam = () => {
           Câu trước
         </Button>
 
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <Box sx={{ display: "flex", gap: 2 }}>
           <Button
             variant="outlined"
             onClick={handleNext}
@@ -379,7 +417,7 @@ const Exam = () => {
           <Button
             variant="contained"
             onClick={handleFinishExam}
-            sx={{ backgroundColor: 'error.main' }}
+            sx={{ backgroundColor: "error.main" }}
           >
             Nộp bài
           </Button>
@@ -390,26 +428,28 @@ const Exam = () => {
       {answeredCount < examQuestions.length && (
         <Alert severity="warning" sx={{ mt: 3 }}>
           <Typography variant="body2">
-            Bạn còn <strong>{examQuestions.length - answeredCount} câu</strong> chưa trả lời. 
-            Hãy kiểm tra lại trước khi nộp bài.
+            Bạn còn <strong>{examQuestions.length - answeredCount} câu</strong>{" "}
+            chưa trả lời. Hãy kiểm tra lại trước khi nộp bài.
           </Typography>
         </Alert>
       )}
 
       {/* Confirmation Dialog */}
-      <Dialog open={showConfirmDialog} onClose={() => setShowConfirmDialog(false)}>
+      <Dialog
+        open={showConfirmDialog}
+        onClose={() => setShowConfirmDialog(false)}
+      >
         <DialogTitle>Xác nhận</DialogTitle>
         <DialogContent>
           <Typography>
-            Bạn có chắc chắn muốn thoát khỏi bài thi? Tiến độ hiện tại sẽ bị mất.
+            Bạn có chắc chắn muốn thoát khỏi bài thi? Tiến độ hiện tại sẽ bị
+            mất.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowConfirmDialog(false)}>
-            Hủy
-          </Button>
-          <Button 
-            onClick={() => navigate('/')} 
+          <Button onClick={() => setShowConfirmDialog(false)}>Hủy</Button>
+          <Button
+            onClick={() => navigate("/")}
             color="error"
             variant="contained"
           >

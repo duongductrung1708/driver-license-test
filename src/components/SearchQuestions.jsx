@@ -12,7 +12,6 @@ import {
   IconButton,
   Collapse,
   Alert,
-  Grid,
   Divider,
 } from '@mui/material';
 import {
@@ -29,7 +28,8 @@ import questionsData from '../data/questions.json';
 
 const SearchQuestions = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [inputValue, setInputValue] = useState('');
+  const [searchTerm, setSearchTerm] = useState(''); // committed query
   const [expandedQuestions, setExpandedQuestions] = useState(new Set());
 
   // Trích xuất từ khóa từ câu hỏi
@@ -124,8 +124,13 @@ const SearchQuestions = () => {
   };
 
   const clearSearch = () => {
+    setInputValue('');
     setSearchTerm('');
     setExpandedQuestions(new Set());
+  };
+
+  const triggerSearch = () => {
+    setSearchTerm(inputValue.trim());
   };
 
   return (
@@ -139,18 +144,28 @@ const SearchQuestions = () => {
           fullWidth
           variant="outlined"
           placeholder="Nhập từ khóa tìm kiếm (ví dụ: biển báo, tốc độ, nồng độ cồn...)"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              triggerSearch();
+            }
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
                 <Search color="primary" />
               </InputAdornment>
             ),
-            endAdornment: searchTerm && (
+            endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={clearSearch} size="small">
-                  <Clear />
+                {searchTerm && (
+                  <IconButton onClick={clearSearch} size="small" aria-label="Xóa tìm kiếm">
+                    <Clear />
+                  </IconButton>
+                )}
+                <IconButton onClick={triggerSearch} size="small" color="primary" aria-label="Tìm kiếm">
+                  <Search />
                 </IconButton>
               </InputAdornment>
             ),
@@ -200,7 +215,7 @@ const SearchQuestions = () => {
                   label={keyword}
                   size="small"
                   variant="outlined"
-                  onClick={() => setSearchTerm(keyword)}
+                  onClick={() => { setInputValue(keyword); setSearchTerm(keyword); }}
                   sx={{ cursor: 'pointer', '&:hover': { backgroundColor: 'action.hover' } }}
                 />
               ))}

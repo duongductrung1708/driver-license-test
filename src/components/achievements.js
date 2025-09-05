@@ -1,80 +1,80 @@
 // Achievements utility: definitions, storage, evaluation
 
 const STORAGE_KEYS = {
-  achievements: 'achievements',
-  lastExamDate: 'lastExamDate',
-  streakCount: 'streakCount'
+  achievements: "achievements",
+  lastExamDate: "lastExamDate",
+  streakCount: "streakCount",
 };
 
 export const ACHIEVEMENTS = {
-  FIRST_PASS: 'first_pass',
-  PERFECT_SCORE: 'perfect_score',
-  SPEED_RUN: 'speed_run',
-  LEARN_FROM_MISTAKES: 'learn_from_mistakes',
-  SIGN_MASTER: 'sign_master',
-  NIGHT_OWL: 'night_owl',
-  DIEM_LIET_MASTER: 'diem_liet_master',
-  STREAK_3: 'streak_3',
-  STREAK_7: 'streak_7',
-  STREAK_30: 'streak_30'
+  FIRST_PASS: "first_pass",
+  PERFECT_SCORE: "perfect_score",
+  SPEED_RUN: "speed_run",
+  LEARN_FROM_MISTAKES: "learn_from_mistakes",
+  SIGN_MASTER: "sign_master",
+  NIGHT_OWL: "night_owl",
+  DIEM_LIET_MASTER: "diem_liet_master",
+  STREAK_3: "streak_3",
+  STREAK_7: "streak_7",
+  STREAK_30: "streak_30",
 };
 
 export const ACHIEVEMENT_META = {
   [ACHIEVEMENTS.FIRST_PASS]: {
-    title: 'Lần Đầu Vượt Ải',
-    description: 'Chúc mừng bạn đã vượt qua bài thi đầu tiên!',
-    icon: '🏁'
+    title: "Lần Đầu Vượt Ải",
+    description: "Chúc mừng bạn đã vượt qua bài thi đầu tiên!",
+    icon: "🏁",
   },
   [ACHIEVEMENTS.PERFECT_SCORE]: {
-    title: 'Điểm Tuyệt Đối',
-    description: 'Đạt điểm tuyệt đối trong một bài thi.',
-    icon: '💯'
+    title: "Điểm Tuyệt Đối",
+    description: "Đạt điểm tuyệt đối trong một bài thi.",
+    icon: "💯",
   },
   [ACHIEVEMENTS.SPEED_RUN]: {
-    title: 'Tốc Độ Bàn Thờ',
-    description: 'Hoàn thành một bài thi trong vòng 5 phút.',
-    icon: '⚡'
+    title: "Tốc Độ Bàn Thờ",
+    description: "Hoàn thành một bài thi trong vòng 5 phút.",
+    icon: "⚡",
   },
   [ACHIEVEMENTS.LEARN_FROM_MISTAKES]: {
-    title: 'Học Từ Lỗi Sai',
-    description: 'Vượt qua bài thi ôn tập các câu bạn đã trả.',
-    icon: '📘'
+    title: "Học Từ Lỗi Sai",
+    description: "Vượt qua bài thi ôn tập các câu bạn đã trả.",
+    icon: "📘",
   },
   [ACHIEVEMENTS.SIGN_MASTER]: {
-    title: 'Vua Biển Báo',
-    description: 'Trả lời đúng 100% câu hỏi biển báo trong bài thi ĐẠT.',
-    icon: '🚧'
+    title: "Vua Biển Báo",
+    description: "Trả lời đúng 100% câu hỏi biển báo trong bài thi ĐẠT.",
+    icon: "🚧",
   },
   [ACHIEVEMENTS.NIGHT_OWL]: {
-    title: 'Cú Đêm',
-    description: 'Hoàn thành một bài thi trong khoảng 0-4h sáng.',
-    icon: '🌙'
+    title: "Cú Đêm",
+    description: "Hoàn thành một bài thi trong khoảng 0-4h sáng.",
+    icon: "🌙",
   },
   [ACHIEVEMENTS.DIEM_LIET_MASTER]: {
-    title: 'Chuyên Gia Điểm Liệt',
-    description: 'Vượt qua bài thi câu điểm liệt.',
-    icon: '🛡️'
+    title: "Chuyên Gia Điểm Liệt",
+    description: "Vượt qua bài thi câu điểm liệt.",
+    icon: "🛡️",
   },
   [ACHIEVEMENTS.STREAK_3]: {
-    title: 'Bắt Đầu Nóng Máy',
-    description: 'Hoàn thành bài thi trong 3 ngày liên tiếp.',
-    icon: '🔥'
+    title: "Bắt Đầu Nóng Máy",
+    description: "Hoàn thành bài thi trong 3 ngày liên tiếp.",
+    icon: "🔥",
   },
   [ACHIEVEMENTS.STREAK_7]: {
-    title: 'Bền Bỉ Cả Tuần',
-    description: 'Hoàn thành bài thi trong 7 ngày liên tiếp.',
-    icon: '🏋️'
+    title: "Bền Bỉ Cả Tuần",
+    description: "Hoàn thành bài thi trong 7 ngày liên tiếp.",
+    icon: "🏋️",
   },
   [ACHIEVEMENTS.STREAK_30]: {
-    title: 'Thói Quen Vàng',
-    description: 'Hoàn thành bài thi trong 30 ngày liên tiếp.',
-    icon: '🏆'
-  }
+    title: "Thói Quen Vàng",
+    description: "Hoàn thành bài thi trong 30 ngày liên tiếp.",
+    icon: "🏆",
+  },
 };
 
 function getStoredAchievements() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.achievements) || '[]');
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.achievements) || "[]");
   } catch {
     return [];
   }
@@ -91,7 +91,10 @@ function getDateString(date) {
 function updateStreakOnExamComplete(now = new Date()) {
   const today = getDateString(now);
   const lastDate = localStorage.getItem(STORAGE_KEYS.lastExamDate);
-  let streak = parseInt(localStorage.getItem(STORAGE_KEYS.streakCount) || '0', 10);
+  let streak = parseInt(
+    localStorage.getItem(STORAGE_KEYS.streakCount) || "0",
+    10
+  );
 
   if (!lastDate) {
     streak = 1;
@@ -113,7 +116,7 @@ function updateStreakOnExamComplete(now = new Date()) {
 }
 
 export function getCurrentStreak() {
-  return parseInt(localStorage.getItem(STORAGE_KEYS.streakCount) || '0', 10);
+  return parseInt(localStorage.getItem(STORAGE_KEYS.streakCount) || "0", 10);
 }
 
 export function getUnlockedAchievements() {
@@ -123,11 +126,12 @@ export function getUnlockedAchievements() {
 export function evaluateAndUnlockAchievements(context) {
   // context: { isPassed, score, totalQuestions, wrongAnswers, allAnswers, mode, durationSeconds, finishedAtISOString, hasDiemLietWrong, diemLietWrongCount }
   const unlocked = new Set(getStoredAchievements());
-  const previouslyUnlocked = new Set(getStoredAchievements());
   const newlyUnlocked = [];
 
   // Streaks (count per day regardless of pass/fail)
-  const streak = updateStreakOnExamComplete(new Date(context.finishedAtISOString || Date.now()));
+  const streak = updateStreakOnExamComplete(
+    new Date(context.finishedAtISOString || Date.now())
+  );
   if (streak >= 3 && !unlocked.has(ACHIEVEMENTS.STREAK_3)) {
     unlocked.add(ACHIEVEMENTS.STREAK_3);
     newlyUnlocked.push(ACHIEVEMENTS.STREAK_3);
@@ -165,27 +169,41 @@ export function evaluateAndUnlockAchievements(context) {
     } catch {}
 
     // Speed run: duration <= 5 minutes (applies to any mode completed within 5 minutes)
-    if (context.durationSeconds !== undefined && context.durationSeconds <= 5 * 60 && !unlocked.has(ACHIEVEMENTS.SPEED_RUN)) {
+    if (
+      context.durationSeconds !== undefined &&
+      context.durationSeconds <= 5 * 60 &&
+      !unlocked.has(ACHIEVEMENTS.SPEED_RUN)
+    ) {
       unlocked.add(ACHIEVEMENTS.SPEED_RUN);
       newlyUnlocked.push(ACHIEVEMENTS.SPEED_RUN);
     }
 
     // Learn from mistakes: pass an exam in 'wrong' practice/exam mode
-    if (context.mode === 'wrong' && !unlocked.has(ACHIEVEMENTS.LEARN_FROM_MISTAKES)) {
+    if (
+      context.mode === "wrong" &&
+      !unlocked.has(ACHIEVEMENTS.LEARN_FROM_MISTAKES)
+    ) {
       unlocked.add(ACHIEVEMENTS.LEARN_FROM_MISTAKES);
       newlyUnlocked.push(ACHIEVEMENTS.LEARN_FROM_MISTAKES);
     }
 
     // Diem liet master: pass without any diem liet wrong
-    if (!context.hasDiemLietWrong && !unlocked.has(ACHIEVEMENTS.DIEM_LIET_MASTER)) {
+    if (
+      !context.hasDiemLietWrong &&
+      !unlocked.has(ACHIEVEMENTS.DIEM_LIET_MASTER)
+    ) {
       unlocked.add(ACHIEVEMENTS.DIEM_LIET_MASTER);
       newlyUnlocked.push(ACHIEVEMENTS.DIEM_LIET_MASTER);
     }
 
     // Sign master: in passed exam, 100% correct on questions that have images (proxy for biển báo)
     if (Array.isArray(context.allAnswers)) {
-      const signAnswers = context.allAnswers.filter(a => !!a.image);
-      if (signAnswers.length > 0 && signAnswers.every(a => a.isCorrect) && !unlocked.has(ACHIEVEMENTS.SIGN_MASTER)) {
+      const signAnswers = context.allAnswers.filter((a) => !!a.image);
+      if (
+        signAnswers.length > 0 &&
+        signAnswers.every((a) => a.isCorrect) &&
+        !unlocked.has(ACHIEVEMENTS.SIGN_MASTER)
+      ) {
         unlocked.add(ACHIEVEMENTS.SIGN_MASTER);
         newlyUnlocked.push(ACHIEVEMENTS.SIGN_MASTER);
       }
@@ -194,16 +212,14 @@ export function evaluateAndUnlockAchievements(context) {
 
   const list = Array.from(unlocked);
   storeAchievements(list);
-  
+
   // Return both the full list and newly unlocked achievements
   return {
     allAchievements: list,
-    newlyUnlocked: newlyUnlocked
+    newlyUnlocked: newlyUnlocked,
   };
 }
 
 export function resetAchievements() {
   storeAchievements([]);
 }
-
-
