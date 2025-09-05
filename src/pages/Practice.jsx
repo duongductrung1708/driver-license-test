@@ -118,11 +118,8 @@ const Practice = () => {
 
     setFilteredQuestions(filtered);
 
-    // Only reset question index if we're not in wrong practice mode or if the current question is out of bounds
-    if (
-      (practiceMode !== "wrong" && practiceMode !== "random") ||
-      currentQuestionIndex >= filtered.length
-    ) {
+    // Keep position stable; only reset if the current index is out of bounds
+    if (currentQuestionIndex >= filtered.length) {
       setCurrentQuestionIndex(0);
       setSelectedAnswer(null);
       setIsAnswered(false);
