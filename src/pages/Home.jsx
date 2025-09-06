@@ -10,6 +10,9 @@ import {
   Paper,
   Chip,
   Alert,
+  Dialog,
+  DialogContent,
+  IconButton,
 } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import {
@@ -23,6 +26,8 @@ import {
   Delete,
   Download,
   Traffic,
+  PlayArrow,
+  Close,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import {
@@ -53,6 +58,7 @@ const Home = () => {
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [diemLietCount, setDiemLietCount] = useState(0);
   const [trafficSignCount, setTrafficSignCount] = useState(0);
+  const [videoOpen, setVideoOpen] = useState(false);
 
   // Load exam history from localStorage
   useEffect(() => {
@@ -138,166 +144,28 @@ const Home = () => {
     playSuccessSound();
   };
 
-  // Hàm tạo và tải về PDF 20 câu điểm liệt
-  const handleDownloadDiemLiet = async () => {
+  // Hàm tải về file PDF có sẵn
+  const handleDownloadDiemLiet = () => {
     playClickSound();
-    const { default: questionsData } = await import("../data/questions.json");
-    const diemLietQuestions = questionsData.filter(
-      (q) => q.isDiemLiet === true
-    );
-
-    const { default: jsPDF } = await import("jspdf");
-    await import("jspdf-autotable");
-    const doc = new jsPDF();
-
-    // Thiết lập font mặc định (có hỗ trợ Unicode tốt hơn)
-    doc.setFont("helvetica");
-
-    // Tiêu đề
-    doc.setFontSize(16);
-    doc.setFont(undefined, "bold");
-    const titleText = "20 CAU DIEM LIET - THI BANG LAI XE";
-    const titleLines = doc.splitTextToSize(titleText, 180);
-    doc.text(titleLines, 105, 20, { align: "center" });
-
-    // Cảnh báo
-    doc.setFontSize(10);
-    doc.setFont(undefined, "bold");
-    doc.setTextColor(255, 0, 0);
-    const warningText = "CANH BAO: Sai 1 cau diem liet = Truot ngay lap tuc!";
-    const warningLines = doc.splitTextToSize(warningText, 180);
-    doc.text(warningLines, 105, 30, { align: "center" });
-
-    let yPosition = 40;
-    doc.setTextColor(0, 0, 0);
-
-    diemLietQuestions.forEach((question, index) => {
-      // Kiểm tra nếu cần thêm trang mới
-      if (yPosition > 250) {
-        doc.addPage();
-        yPosition = 20;
-      }
-
-      // Số câu hỏi
-      doc.setFontSize(10);
-      doc.setFont(undefined, "bold");
-      const questionText = `${index + 1}. ${question.question}`;
-      const questionLines = doc.splitTextToSize(questionText, 160);
-      doc.text(questionLines, 20, yPosition);
-      yPosition += questionLines.length * 6 + 5;
-
-      // Hình ảnh (nếu có)
-      if (question.image) {
-        doc.setFontSize(8);
-        doc.setFont(undefined, "normal");
-        doc.setTextColor(100, 100, 100);
-        const imageText = `[Hinh anh: ${question.image}]`;
-        const imageLines = doc.splitTextToSize(imageText, 160);
-        doc.text(imageLines, 25, yPosition);
-        yPosition += imageLines.length * 5 + 3;
-      }
-
-      // Các đáp án
-      doc.setFontSize(9);
-      doc.setFont(undefined, "normal");
-      doc.setTextColor(0, 0, 0);
-      question.answers.forEach((answer, ansIndex) => {
-        const marker = ansIndex === question.correctAnswer ? "✓" : "○";
-        const answerText = `${marker} ${answer}`;
-        const answerLines = doc.splitTextToSize(answerText, 150);
-        const color =
-          ansIndex === question.correctAnswer ? [0, 128, 0] : [0, 0, 0];
-        doc.setTextColor(...color);
-        doc.text(answerLines, 30, yPosition);
-        yPosition += answerLines.length * 5 + 3;
-      });
-
-      // Giải thích
-      doc.setTextColor(0, 0, 128);
-      const explanationText = `Giai thich: ${question.explanation}`;
-      const explanationLines = doc.splitTextToSize(explanationText, 150);
-      doc.text(explanationLines, 25, yPosition);
-      yPosition += explanationLines.length * 5 + 8;
-    });
-
-    doc.save("20-cau-diem-liet.pdf");
+    // Tạo link tải file PDF có sẵn
+    const link = document.createElement('a');
+    link.href = '/documents/20-cau-diem-liet.pdf'; // Đường dẫn đến file PDF có sẵn
+    link.download = '20-cau-diem-liet.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     playSuccessSound();
   };
 
-  // Hàm tạo và tải về PDF 250 câu hỏi
-  const handleDownloadFullQuestions = async () => {
+  const handleDownloadFullQuestions = () => {
     playClickSound();
-    const { default: jsPDF } = await import("jspdf");
-    await import("jspdf-autotable");
-    const doc = new jsPDF();
-
-    // Thiết lập font mặc định (có hỗ trợ Unicode tốt hơn)
-    doc.setFont("helvetica");
-
-    // Tiêu đề
-    doc.setFontSize(16);
-    doc.setFont(undefined, "bold");
-    const titleText = "BO DE 250 CAU HOI THI BANG LAI XE";
-    const titleLines = doc.splitTextToSize(titleText, 180);
-    doc.text(titleLines, 105, 20, { align: "center" });
-
-    let yPosition = 35;
-    doc.setTextColor(0, 0, 0);
-
-    const { default: questionsData } = await import("../data/questions.json");
-    questionsData.forEach((question, index) => {
-      // Kiểm tra nếu cần thêm trang mới
-      if (yPosition > 250) {
-        doc.addPage();
-        yPosition = 20;
-      }
-
-      // Số câu hỏi và nội dung
-      doc.setFontSize(10);
-      doc.setFont(undefined, "bold");
-      const diemLietMarker = question.isDiemLiet ? " [DIEM LIET]" : "";
-      const questionText = `${index + 1}. ${
-        question.question
-      }${diemLietMarker}`;
-      const questionLines = doc.splitTextToSize(questionText, 160);
-      doc.text(questionLines, 20, yPosition);
-      yPosition += questionLines.length * 6 + 5;
-
-      // Hình ảnh (nếu có)
-      if (question.image) {
-        doc.setFontSize(8);
-        doc.setFont(undefined, "normal");
-        doc.setTextColor(100, 100, 100);
-        const imageText = `[Hinh anh: ${question.image}]`;
-        const imageLines = doc.splitTextToSize(imageText, 160);
-        doc.text(imageLines, 25, yPosition);
-        yPosition += imageLines.length * 5 + 3;
-      }
-
-      // Các đáp án
-      doc.setFontSize(9);
-      doc.setFont(undefined, "normal");
-      doc.setTextColor(0, 0, 0);
-      question.answers.forEach((answer, ansIndex) => {
-        const marker = ansIndex === question.correctAnswer ? "✓" : "○";
-        const answerText = `${marker} ${answer}`;
-        const answerLines = doc.splitTextToSize(answerText, 150);
-        const color =
-          ansIndex === question.correctAnswer ? [0, 128, 0] : [0, 0, 0];
-        doc.setTextColor(...color);
-        doc.text(answerLines, 30, yPosition);
-        yPosition += answerLines.length * 5 + 3;
-      });
-
-      // Giải thích
-      doc.setTextColor(0, 0, 128);
-      const explanationText = `Giai thich: ${question.explanation}`;
-      const explanationLines = doc.splitTextToSize(explanationText, 150);
-      doc.text(explanationLines, 25, yPosition);
-      yPosition += explanationLines.length * 5 + 8;
-    });
-
-    doc.save("250-cau-hoi-thi-bang-lai.pdf");
+    // Tạo link tải file PDF có sẵn
+    const link = document.createElement('a');
+    link.href = '/documents/250-cau-hoi-thi-bang-lai.pdf'; // Đường dẫn đến file PDF có sẵn
+    link.download = '250-cau-hoi-thi-bang-lai.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     playSuccessSound();
   };
 
@@ -852,6 +720,65 @@ const Home = () => {
         </Grid>
       </Paper>
 
+      {/* Video hướng dẫn thi */}
+      <Paper sx={{ p: 3, mb: 4, backgroundColor: "background.default" }}>
+        <Typography
+          variant="h5"
+          gutterBottom
+          sx={{ fontWeight: "bold", mb: 3 }}
+        >
+          🎥 Video hướng dẫn thi
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          Xem video hướng dẫn chi tiết về cách thi và các mẹo làm bài hiệu quả
+        </Typography>
+        <Box 
+          sx={{ 
+            position: 'relative', 
+            width: '100%', 
+            height: 0, 
+            paddingBottom: '56.25%', // 16:9 aspect ratio
+            mb: 3,
+            cursor: 'pointer',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            '&:hover': {
+              transform: 'scale(1.02)',
+              transition: 'transform 0.3s ease'
+            }
+          }}
+          onClick={() => {
+            playClickSound();
+            setVideoOpen(true);
+          }}
+        >
+          {/* Thumbnail background */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              color: 'white'
+            }}
+          >
+            <PlayArrow sx={{ fontSize: 80, mb: 2 }} />
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              Hướng dẫn thi bằng lái xe A1
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.9, mt: 1 }}>
+              Bấm để xem video hướng dẫn
+            </Typography>
+          </Box>
+        </Box>
+      </Paper>
+
       {/* Tải tài liệu học tập */}
       <Paper sx={{ p: 3, mb: 4, backgroundColor: "background.default" }}>
         <Typography
@@ -1134,6 +1061,66 @@ const Home = () => {
         )}
       </Suspense>
       <SoundControl />
+
+      {/* Video Popup Modal */}
+      <Dialog
+        open={videoOpen}
+        onClose={() => setVideoOpen(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+            overflow: 'visible'
+          }
+        }}
+      >
+        <DialogContent sx={{ p: 0, position: 'relative' }}>
+          <IconButton
+            onClick={() => setVideoOpen(false)}
+            sx={{
+              position: 'absolute',
+              top: -10,
+              right: -10,
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              color: 'white',
+              zIndex: 1,
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+              }
+            }}
+          >
+            <Close />
+          </IconButton>
+          <Box sx={{ 
+            position: 'relative', 
+            width: '100%', 
+            height: 0, 
+            paddingBottom: '56.25%', // 16:9 aspect ratio
+            borderRadius: '8px',
+            overflow: 'hidden'
+          }}>
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/ISJeeUw_xKs?si=7yKLf7TaQvJufvsk"
+              title="Hướng dẫn thi bằng lái xe A1"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                borderRadius: '8px'
+              }}
+            />
+          </Box>
+        </DialogContent>
+      </Dialog>
 
       {/* Footer */}
       <Box
