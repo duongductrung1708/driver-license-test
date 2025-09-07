@@ -12,9 +12,12 @@ import Home from "./pages/Home";
 import Practice from "./pages/Practice";
 import Exam from "./pages/Exam";
 import Result from "./pages/Result";
+import NotFound from "./pages/NotFound";
+import Offline from "./pages/Offline";
 import Settings from "./components/Settings";
 import ThemeNotification from "./components/ThemeNotification";
 import ThemeInfo from "./components/ThemeInfo";
+import ConnectionMonitor from "./components/ConnectionMonitor";
 import "./styles/theme.css";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -140,6 +143,7 @@ const AppContent = () => {
         } page-transition`}
       >
         <Router>
+          <ConnectionMonitor />
           <Settings />
           <ThemeNotification />
           <ThemeInfo />
@@ -148,6 +152,8 @@ const AppContent = () => {
             <Route path="/practice" element={<Practice />} />
             <Route path="/exam" element={<Exam />} />
             <Route path="/result" element={<Result />} />
+            <Route path="/offline" element={<Offline />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
         <Analytics />
