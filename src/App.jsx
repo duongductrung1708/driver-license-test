@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import {
   ThemeProvider as MuiThemeProvider,
@@ -8,18 +8,18 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "./context/ThemeContext";
 import { useTheme } from "./context/ThemeContext";
 import { SoundProvider } from "./context/SoundContext";
-import Home from "./pages/Home";
-import Practice from "./pages/Practice";
-import Exam from "./pages/Exam";
-import Result from "./pages/Result";
-import NotFound from "./pages/NotFound";
-import Offline from "./pages/Offline";
-import Settings from "./components/Settings";
-import ThemeNotification from "./components/ThemeNotification";
-import ThemeInfo from "./components/ThemeInfo";
 import ConnectionMonitor from "./components/ConnectionMonitor";
 import "./styles/theme.css";
 import { Analytics } from "@vercel/analytics/react";
+const Home = React.lazy(() => import("./pages/Home"));
+const Practice = React.lazy(() => import("./pages/Practice"));
+const Exam = React.lazy(() => import("./pages/Exam"));
+const Result = React.lazy(() => import("./pages/Result"));
+const NotFound = React.lazy(() => import("./pages/NotFound"));
+const Offline = React.lazy(() => import("./pages/Offline"));
+const Settings = React.lazy(() => import("./components/Settings"));
+const ThemeNotification = React.lazy(() => import("./components/ThemeNotification"));
+const ThemeInfo = React.lazy(() => import("./components/ThemeInfo"));
 
 // Component để tạo theme động
 const AppContent = () => {
@@ -144,17 +144,21 @@ const AppContent = () => {
       >
         <Router>
           <ConnectionMonitor />
-          <Settings />
-          <ThemeNotification />
-          <ThemeInfo />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/practice" element={<Practice />} />
-            <Route path="/exam" element={<Exam />} />
-            <Route path="/result" element={<Result />} />
-            <Route path="/offline" element={<Offline />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={null}>
+            <Settings />
+            <ThemeNotification />
+            <ThemeInfo />
+          </Suspense>
+          <Suspense fallback={null}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/practice" element={<Practice />} />
+              <Route path="/exam" element={<Exam />} />
+              <Route path="/result" element={<Result />} />
+              <Route path="/offline" element={<Offline />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </Router>
         <Analytics />
       </div>

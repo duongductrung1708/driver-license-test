@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogActions,
   Paper,
+  Skeleton,
 } from "@mui/material";
 import { Home } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +19,7 @@ import ProgressBar from "../components/ProgressBar";
 import Timer from "../components/Timer";
 import questionsData from "../data/questions.json";
 import { evaluateAndUnlockAchievements } from "../components/achievements";
+import { CATEGORY, inferCategory } from "../utils/category";
 
 const Exam = () => {
   const navigate = useNavigate();
@@ -29,6 +31,7 @@ const Exam = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [hasDiemLietWrong, setHasDiemLietWrong] = useState(false);
   const [examStartTime, setExamStartTime] = useState(null);
+  const [isQuestionLoading, setIsQuestionLoading] = useState(false);
 
   // Support multiple exam modes via location.state
   const urlParamsMode =
@@ -38,9 +41,27 @@ const Exam = () => {
   const isSpeedExam = urlParamsMode === "speed";
   const isTrafficSignExam = urlParamsMode === "trafficSign";
   const isDiemLietExam = urlParamsMode === "diemLiet";
+  const isCatKhaiNiem = urlParamsMode === "cat_khaiNiemQuyTac";
+  const isCatVanHoa = urlParamsMode === "cat_vanHoaGiaoThong";
+  const isCatKyThuat = urlParamsMode === "cat_kyThuatLaiXe";
+  const isCatSaHinh = urlParamsMode === "cat_saHinh";
 
   const EXAM_DURATION = isFullExam ? 190 * 60 : isSpeedExam ? 5 * 60 : 19 * 60; // seconds
-  const TOTAL_QUESTIONS = isFullExam ? questionsData.length : isTrafficSignExam ? questionsData.filter(q => q.isTrafficSign).length : isDiemLietExam ? questionsData.filter(q => q.isDiemLiet).length : 25;
+  const TOTAL_QUESTIONS = isFullExam
+    ? questionsData.length
+    : isTrafficSignExam
+    ? questionsData.filter((q) => q.isTrafficSign).length
+    : isDiemLietExam
+    ? questionsData.filter((q) => q.isDiemLiet).length
+    : isCatKhaiNiem
+    ? questionsData.filter((q) => inferCategory(q) === CATEGORY.KHAI_NIEM_QUY_TAC).length
+    : isCatVanHoa
+    ? questionsData.filter((q) => inferCategory(q) === CATEGORY.VAN_HOA_GIAO_THONG).length
+    : isCatKyThuat
+    ? questionsData.filter((q) => inferCategory(q) === CATEGORY.KY_THUAT_LAI_XE).length
+    : isCatSaHinh
+    ? questionsData.filter((q) => inferCategory(q) === CATEGORY.SA_HINH).length
+    : 25;
 
   // Generate random exam questions
   const generateExamQuestions = () => {
@@ -69,6 +90,32 @@ const Exam = () => {
       return shuffle(diemLietQs).slice(0, TOTAL_QUESTIONS);
     }
 
+    // Category-based exams
+    if (isCatKhaiNiem) {
+      const qs = questionsData.filter(
+        (q) => inferCategory(q) === CATEGORY.KHAI_NIEM_QUY_TAC
+      );
+      return shuffle(qs).slice(0, TOTAL_QUESTIONS);
+    }
+    if (isCatVanHoa) {
+      const qs = questionsData.filter(
+        (q) => inferCategory(q) === CATEGORY.VAN_HOA_GIAO_THONG
+      );
+      return shuffle(qs).slice(0, TOTAL_QUESTIONS);
+    }
+    if (isCatKyThuat) {
+      const qs = questionsData.filter(
+        (q) => inferCategory(q) === CATEGORY.KY_THUAT_LAI_XE
+      );
+      return shuffle(qs).slice(0, TOTAL_QUESTIONS);
+    }
+    if (isCatSaHinh) {
+      const qs = questionsData.filter(
+        (q) => inferCategory(q) === CATEGORY.SA_HINH
+      );
+      return shuffle(qs).slice(0, TOTAL_QUESTIONS);
+    }
+
     // Full exam: all questions shuffled
     if (isFullExam) {
       return shuffle([...questionsData]).slice(0, TOTAL_QUESTIONS);
@@ -95,6 +142,8 @@ const Exam = () => {
     setIsExamFinished(false);
     setHasDiemLietWrong(false);
     setExamStartTime(new Date());
+    setIsQuestionLoading(true);
+    setTimeout(() => setIsQuestionLoading(false), 250);
   };
 
   const handleAnswerSelect = (answerIndex) => {
@@ -109,12 +158,16 @@ const Exam = () => {
   const handleNext = () => {
     if (currentQuestionIndex < examQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setIsQuestionLoading(true);
+      setTimeout(() => setIsQuestionLoading(false), 250);
     }
   };
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
+      setIsQuestionLoading(true);
+      setTimeout(() => setIsQuestionLoading(false), 250);
     }
   };
 
@@ -283,6 +336,19 @@ const Exam = () => {
   const selectedAnswer = answers[currentQuestionIndex];
   const answeredCount = Object.keys(answers).length;
 
+  const renderQuestionSkeleton = () => (
+    <Paper sx={{ p: 2, mb: 3 }}>
+      <Skeleton variant="text" height={28} width="60%" sx={{ mb: 1 }} />
+      <Skeleton variant="text" height={18} width="40%" sx={{ mb: 2 }} />
+      {currentQuestion?.image && (
+        <Skeleton variant="rectangular" height={200} sx={{ mb: 2, borderRadius: 1 }} />
+      )}
+      {Array.from({ length: (currentQuestion?.answers?.length || 4) }).map((_, i) => (
+        <Skeleton key={i} variant="rounded" height={44} sx={{ mb: 1.5, borderRadius: 1 }} />
+      ))}
+    </Paper>
+  );
+
   if (!isExamStarted) {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
@@ -316,6 +382,14 @@ const Exam = () => {
               ? "Thi biển báo"
               : isDiemLietExam
               ? "Thi câu điểm liệt"
+              : isCatKhaiNiem
+              ? `Thi ${CATEGORY.KHAI_NIEM_QUY_TAC}`
+              : isCatVanHoa
+              ? `Thi ${CATEGORY.VAN_HOA_GIAO_THÔNG}`
+              : isCatKyThuat
+              ? `Thi ${CATEGORY.KY_THUAT_LÁI_XE}`
+              : isCatSaHinh
+              ? `Thi ${CATEGORY.SA_HÌNH}`
               : isSpeedExam
               ? "Thi tốc độ 25 câu"
               : "Bài thi thử bằng lái xe A1"}
@@ -353,6 +427,26 @@ const Exam = () => {
                 {isDiemLietExam && (
                   <Typography variant="body1" sx={{ mb: 2 }}>
                     • Nội dung: <strong>Chỉ 20 câu điểm liệt quan trọng</strong>
+                  </Typography>
+                )}
+                {isCatKhaiNiem && (
+                  <Typography variant="body1" sx={{ mb: 2 }}>
+                    • Nội dung: <strong>{CATEGORY.KHAI_NIEM_QUY_TAC}</strong>
+                  </Typography>
+                )}
+                {isCatVanHoa && (
+                  <Typography variant="body1" sx={{ mb: 2 }}>
+                    • Nội dung: <strong>{CATEGORY.VAN_HOA_GIAO_THONG}</strong>
+                  </Typography>
+                )}
+                {isCatKyThuat && (
+                  <Typography variant="body1" sx={{ mb: 2 }}>
+                    • Nội dung: <strong>{CATEGORY.KY_THUAT_LAI_XE}</strong>
+                  </Typography>
+                )}
+                {isCatSaHinh && (
+                  <Typography variant="body1" sx={{ mb: 2 }}>
+                    • Nội dung: <strong>{CATEGORY.SA_HINH}</strong>
                   </Typography>
                 )}
               </>
@@ -422,15 +516,19 @@ const Exam = () => {
       />
 
       {/* Question */}
-      {currentQuestion && (
-        <QuizQuestion
-          key={currentQuestionIndex}
-          question={currentQuestion}
-          selectedAnswer={selectedAnswer}
-          onAnswerSelect={handleAnswerSelect}
-          isAnswered={false}
-          questionNumber={currentQuestionIndex + 1}
-        />
+      {isQuestionLoading || !currentQuestion ? (
+        renderQuestionSkeleton()
+      ) : (
+        currentQuestion && (
+          <QuizQuestion
+            key={currentQuestionIndex}
+            question={currentQuestion}
+            selectedAnswer={selectedAnswer}
+            onAnswerSelect={handleAnswerSelect}
+            isAnswered={false}
+            questionNumber={currentQuestionIndex + 1}
+          />
+        )
       )}
 
       {/* Navigation Buttons */}

@@ -10,6 +10,7 @@ import {
   MenuItem,
   Alert,
   Paper,
+  Skeleton,
 } from "@mui/material";
 import {
   NavigateBefore,
@@ -22,6 +23,7 @@ import { useMemo } from "react";
 import QuizQuestion from "../components/QuizQuestion";
 import ProgressBar from "../components/ProgressBar";
 import DiemLietStats from "../components/DiemLietStats";
+import { CATEGORY, inferCategory } from "../utils/category";
 import questionsData from "../data/questions.json";
 import useSound from "../hooks/useSound";
 import SoundControl from "../components/SoundControl";
@@ -44,6 +46,7 @@ const Practice = () => {
   const [answeredQuestions, setAnsweredQuestions] = useState({});
   const [randomQuestions, setRandomQuestions] = useState([]);
   const { playCorrect, playIncorrect } = useSound();
+  const [isQuestionLoading, setIsQuestionLoading] = useState(true);
 
   // Load wrong answers from localStorage
   useEffect(() => {
@@ -82,6 +85,7 @@ const Practice = () => {
 
   // Filter questions based on selected filter and practice mode
   useEffect(() => {
+    setIsQuestionLoading(true);
     let filtered = questionsData;
 
     // Apply practice mode filter first
@@ -94,6 +98,22 @@ const Practice = () => {
     } else if (practiceMode === "trafficSign") {
       // For trafficSign mode, select only traffic sign questions
       filtered = questionsData.filter((q) => q.isTrafficSign);
+    } else if (practiceMode === "cat_khaiNiemQuyTac") {
+      filtered = questionsData.filter(
+        (q) => inferCategory(q) === CATEGORY.KHAI_NIEM_QUY_TAC
+      );
+    } else if (practiceMode === "cat_vanHoaGiaoThong") {
+      filtered = questionsData.filter(
+        (q) => inferCategory(q) === CATEGORY.VAN_HOA_GIAO_THONG
+      );
+    } else if (practiceMode === "cat_kyThuatLaiXe") {
+      filtered = questionsData.filter(
+        (q) => inferCategory(q) === CATEGORY.KY_THUAT_LAI_XE
+      );
+    } else if (practiceMode === "cat_saHinh") {
+      filtered = questionsData.filter(
+        (q) => inferCategory(q) === CATEGORY.SA_HINH
+      );
     } else if (practiceMode === "wrong") {
       // Practice only wrong questions from state
       const wrongQuestionIds = wrongAnswers.map((w) => w.questionId);
@@ -110,6 +130,26 @@ const Practice = () => {
         break;
       case "trafficSign":
         filtered = filtered.filter((q) => q.isTrafficSign);
+        break;
+      case "cat_khaiNiemQuyTac":
+        filtered = filtered.filter(
+          (q) => inferCategory(q) === CATEGORY.KHAI_NIEM_QUY_TAC
+        );
+        break;
+      case "cat_vanHoaGiaoThong":
+        filtered = filtered.filter(
+          (q) => inferCategory(q) === CATEGORY.VAN_HOA_GIAO_THONG
+        );
+        break;
+      case "cat_kyThuatLaiXe":
+        filtered = filtered.filter(
+          (q) => inferCategory(q) === CATEGORY.KY_THUAT_LAI_XE
+        );
+        break;
+      case "cat_saHinh":
+        filtered = filtered.filter(
+          (q) => inferCategory(q) === CATEGORY.SA_HINH
+        );
         break;
       case "wrong":
         {
@@ -159,6 +199,9 @@ const Practice = () => {
         setIsAnswered(false);
       }
     }
+    // Simulate lightweight loading for nicer UX
+    const timeout = setTimeout(() => setIsQuestionLoading(false), 250);
+    return () => clearTimeout(timeout);
   }, [
     filter,
     practiceMode,
@@ -169,6 +212,20 @@ const Practice = () => {
   ]);
 
   const currentQuestion = filteredQuestions[currentQuestionIndex];
+
+  // Show skeleton while loading current question
+  const renderQuestionSkeleton = () => (
+    <Paper sx={{ p: 2, mb: 3 }}>
+      <Skeleton variant="text" height={28} width="60%" sx={{ mb: 1 }} />
+      <Skeleton variant="text" height={18} width="40%" sx={{ mb: 2 }} />
+      {currentQuestion?.image && (
+        <Skeleton variant="rectangular" height={200} sx={{ mb: 2, borderRadius: 1 }} />
+      )}
+      {[0, 1, 2, 3].map((i) => (
+        <Skeleton key={i} variant="rounded" height={44} sx={{ mb: 1.5, borderRadius: 1 }} />
+      ))}
+    </Paper>
+  );
 
   const handleAnswerSelect = (answerIndex) => {
     if (isAnswered) return;
@@ -316,6 +373,14 @@ const Practice = () => {
             ? "Học câu điểm liệt"
             : practiceMode === "trafficSign"
             ? "Học biển báo"
+            : practiceMode === "cat_khaiNiemQuyTac"
+            ? CATEGORY.KHAI_NIEM_QUY_TAC
+            : practiceMode === "cat_vanHoaGiaoThong"
+            ? CATEGORY.VAN_HOA_GIAO_THONG
+            : practiceMode === "cat_kyThuatLaiXe"
+            ? CATEGORY.KY_THUAT_LAI_XE
+            : practiceMode === "cat_saHinh"
+            ? CATEGORY.SA_HINH
             : practiceMode === "wrong"
             ? "Ôn tập các câu đã sai"
             : practiceMode === "custom"
@@ -347,13 +412,21 @@ const Practice = () => {
               ? "Chế độ học 20 câu điểm liệt quan trọng"
               : practiceMode === "trafficSign"
               ? "Chế độ học các câu hỏi về biển báo giao thông"
+              : practiceMode === "cat_khaiNiemQuyTac"
+              ? "Học nhóm Khái Niệm & Quy Tắc"
+              : practiceMode === "cat_vanHoaGiaoThong"
+              ? "Học nhóm Văn Hóa Giao Thông"
+              : practiceMode === "cat_kyThuatLaiXe"
+              ? "Học nhóm Kỹ Thuật Lái Xe"
+              : practiceMode === "cat_saHinh"
+              ? "Học nhóm Sa Hình"
               : practiceMode === "wrong"
               ? "Luyện tập lại các câu bạn đã làm sai trước đó"
               : practiceMode === "custom"
               ? `Ôn tập ${customQuestionIds.length} câu hỏi liên quan đến từ khóa: "${searchTerm}"`
               : "Chế độ ôn tập toàn bộ 250 câu hỏi"}
           </Typography>
-          <Box sx={{ display: "flex", gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", rowGap: 1.5 }}>
             {practiceMode !== "diemLiet" && practiceMode !== "custom" && (
               <Button
                 variant="outlined"
@@ -380,6 +453,46 @@ const Practice = () => {
               >
                 Học các câu đã sai
               </Button>
+            )}
+            {practiceMode !== "custom" && (
+              <>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() =>
+                    navigate("/practice", { state: { mode: "cat_khaiNiemQuyTac" } })
+                  }
+                >
+                  {CATEGORY.KHAI_NIEM_QUY_TAC}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() =>
+                    navigate("/practice", { state: { mode: "cat_vanHoaGiaoThong" } })
+                  }
+                >
+                  {CATEGORY.VAN_HOA_GIAO_THONG}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() =>
+                    navigate("/practice", { state: { mode: "cat_kyThuatLaiXe" } })
+                  }
+                >
+                  {CATEGORY.KY_THUAT_LAI_XE}
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() =>
+                    navigate("/practice", { state: { mode: "cat_saHinh" } })
+                  }
+                >
+                  {CATEGORY.SA_HINH}
+                </Button>
+              </>
             )}
             {practiceMode !== "custom" && (
               <Button
@@ -450,6 +563,10 @@ const Practice = () => {
                   )
                 </MenuItem>
               )}
+              <MenuItem value="cat_khaiNiemQuyTac">{CATEGORY.KHAI_NIEM_QUY_TAC}</MenuItem>
+              <MenuItem value="cat_vanHoaGiaoThong">{CATEGORY.VAN_HOA_GIAO_THONG}</MenuItem>
+              <MenuItem value="cat_kyThuatLaiXe">{CATEGORY.KY_THUAT_LAI_XE}</MenuItem>
+              <MenuItem value="cat_saHinh">{CATEGORY.SA_HINH}</MenuItem>
               <MenuItem value="wrong">
                 Câu đã sai trước đó ({wrongAnswers.length})
               </MenuItem>
@@ -480,14 +597,18 @@ const Practice = () => {
       )}
 
       {/* Question */}
-      {currentQuestion && (
-        <QuizQuestion
-          question={currentQuestion}
-          selectedAnswer={selectedAnswer}
-          onAnswerSelect={handleAnswerSelect}
-          isAnswered={isAnswered}
-          questionNumber={currentQuestionIndex + 1}
-        />
+      {isQuestionLoading || !currentQuestion ? (
+        renderQuestionSkeleton()
+      ) : (
+        currentQuestion && (
+          <QuizQuestion
+            question={currentQuestion}
+            selectedAnswer={selectedAnswer}
+            onAnswerSelect={handleAnswerSelect}
+            isAnswered={isAnswered}
+            questionNumber={currentQuestionIndex + 1}
+          />
+        )
       )}
 
       {/* Navigation Buttons */}

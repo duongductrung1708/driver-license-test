@@ -13,6 +13,7 @@ import {
   Dialog,
   DialogContent,
   IconButton,
+  Skeleton,
 } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import {
@@ -59,6 +60,11 @@ const Home = () => {
   const [diemLietCount, setDiemLietCount] = useState(0);
   const [trafficSignCount, setTrafficSignCount] = useState(0);
   const [videoOpen, setVideoOpen] = useState(false);
+  const [isMetaLoading, setIsMetaLoading] = useState(true);
+  const [catKhaiNiemCount, setCatKhaiNiemCount] = useState(0);
+  const [catVanHoaCount, setCatVanHoaCount] = useState(0);
+  const [catKyThuatCount, setCatKyThuatCount] = useState(0);
+  const [catSaHinhCount, setCatSaHinhCount] = useState(0);
 
   // Load exam history from localStorage
   useEffect(() => {
@@ -86,10 +92,32 @@ const Home = () => {
         setTotalQuestions(total);
         setDiemLietCount(dl);
         setTrafficSignCount(ts);
+        const khaiNiem = isArray
+          ? data.filter((q) => q.isKhaiNiemQuyTac === true).length
+          : 0;
+        const vanHoa = isArray
+          ? data.filter((q) => q.isVanHoaGiaoThong === true).length
+          : 0;
+        const kyThuat = isArray
+          ? data.filter((q) => q.isKyThuatLaiXe === true).length
+          : 0;
+        const saHinh = isArray
+          ? data.filter((q) => q.isSaHinh === true).length
+          : 0;
+        setCatKhaiNiemCount(khaiNiem);
+        setCatVanHoaCount(vanHoa);
+        setCatKyThuatCount(kyThuat);
+        setCatSaHinhCount(saHinh);
       } catch (_) {
         setTotalQuestions(0);
         setDiemLietCount(0);
         setTrafficSignCount(0);
+        setCatKhaiNiemCount(0);
+        setCatVanHoaCount(0);
+        setCatKyThuatCount(0);
+        setCatSaHinhCount(0);
+      } finally {
+        setIsMetaLoading(false);
       }
     })();
   }, []);
@@ -180,6 +208,8 @@ const Home = () => {
         navigate("/practice", { state: { mode: "random" } });
       },
       buttonColor: "primary",
+      buttonBg: "linear-gradient(45deg, #2196f3 30%, #21cbf3 90%)",
+      buttonHoverBg: "linear-gradient(45deg, #1976d2 30%, #1cb5e0 90%)",
     },
     {
       icon: <School sx={{ fontSize: 40, color: "warning.main" }} />,
@@ -190,6 +220,8 @@ const Home = () => {
         navigate("/practice", { state: { mode: "full" } });
       },
       buttonColor: "warning",
+      buttonBg: "linear-gradient(45deg, #ff9800 30%, #ffc107 90%)",
+      buttonHoverBg: "linear-gradient(45deg, #f57c00 30%, #ff9800 90%)",
     },
     {
       icon: <Traffic sx={{ fontSize: 40, color: "info.main" }} />,
@@ -200,6 +232,48 @@ const Home = () => {
         navigate("/practice", { state: { mode: "trafficSign" } });
       },
       buttonColor: "info",
+      buttonBg: "linear-gradient(45deg, #00bcd4 30%, #2196f3 90%)",
+      buttonHoverBg: "linear-gradient(45deg, #0097a7 30%, #1976d2 90%)",
+    },
+    {
+      icon: <School sx={{ fontSize: 40, color: "primary.light" }} />,
+      title: `Khái Niệm & Quy Tắc (${catKhaiNiemCount})`,
+      description: "Ôn tập nhóm Khái Niệm & Quy Tắc",
+      action: () => {
+        playClickSound();
+        navigate("/practice", { state: { mode: "cat_khaiNiemQuyTac" } });
+      },
+      buttonColor: "primary",
+    },
+    {
+      icon: <School sx={{ fontSize: 40, color: "success.main" }} />,
+      title: `Văn Hóa Giao Thông (${catVanHoaCount})`,
+      description: "Ôn tập nhóm Văn Hóa Giao Thông",
+      action: () => {
+        playClickSound();
+        navigate("/practice", { state: { mode: "cat_vanHoaGiaoThong" } });
+      },
+      buttonColor: "success",
+    },
+    {
+      icon: <School sx={{ fontSize: 40, color: "secondary.main" }} />,
+      title: `Kỹ Thuật Lái Xe (${catKyThuatCount})`,
+      description: "Ôn tập nhóm Kỹ Thuật Lái Xe",
+      action: () => {
+        playClickSound();
+        navigate("/practice", { state: { mode: "cat_kyThuatLaiXe" } });
+      },
+      buttonColor: "secondary",
+    },
+    {
+      icon: <School sx={{ fontSize: 40, color: "primary.dark" }} />,
+      title: `Sa Hình (${catSaHinhCount})`,
+      description: "Ôn tập nhóm Sa Hình",
+      action: () => {
+        playClickSound();
+        navigate("/practice", { state: { mode: "cat_saHinh" } });
+      },
+      buttonColor: "primary",
     },
     {
       icon: <Warning sx={{ fontSize: 40, color: "error.main" }} />,
@@ -210,6 +284,8 @@ const Home = () => {
         navigate("/practice", { state: { mode: "diemLiet" } });
       },
       buttonColor: "error",
+      buttonBg: "linear-gradient(45deg, #f44336 30%, #ff7043 90%)",
+      buttonHoverBg: "linear-gradient(45deg, #d32f2f 30%, #f4511e 90%)",
     },
     {
       icon: <History sx={{ fontSize: 40, color: "secondary.main" }} />,
@@ -223,6 +299,8 @@ const Home = () => {
         navigate("/practice", { state: { mode: "wrong" } });
       },
       buttonColor: "secondary",
+      buttonBg: "linear-gradient(45deg, #7b1fa2 30%, #ab47bc 90%)",
+      buttonHoverBg: "linear-gradient(45deg, #6a1b9a 30%, #9c27b0 90%)",
       disabled: wrongCount === 0,
     },
   ];
@@ -238,6 +316,8 @@ const Home = () => {
         navigate("/exam");
       },
       buttonColor: "success",
+      buttonBg: "linear-gradient(45deg, #43a047 30%, #66bb6a 90%)",
+      buttonHoverBg: "linear-gradient(45deg, #388e3c 30%, #43a047 90%)",
     },
     {
       icon: <Quiz sx={{ fontSize: 40, color: "info.main" }} />,
@@ -248,6 +328,8 @@ const Home = () => {
         navigate("/exam", { state: { mode: "full" } });
       },
       buttonColor: "info",
+      buttonBg: "linear-gradient(45deg, #03a9f4 30%, #00bcd4 90%)",
+      buttonHoverBg: "linear-gradient(45deg, #0288d1 30%, #0097a7 90%)",
     },
     {
       icon: <Traffic sx={{ fontSize: 40, color: "primary.main" }} />,
@@ -256,6 +338,48 @@ const Home = () => {
       action: () => {
         playClickSound();
         navigate("/exam", { state: { mode: "trafficSign" } });
+      },
+      buttonColor: "primary",
+      buttonBg: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+      buttonHoverBg: "linear-gradient(45deg, #1565c0 30%, #1e88e5 90%)",
+    },
+    {
+      icon: <Quiz sx={{ fontSize: 40, color: "primary.light" }} />,
+      title: `Thi Khái Niệm & Quy Tắc (${catKhaiNiemCount})`,
+      description: "Thi theo nhóm Khái Niệm & Quy Tắc",
+      action: () => {
+        playClickSound();
+        navigate("/exam", { state: { mode: "cat_khaiNiemQuyTac" } });
+      },
+      buttonColor: "primary",
+    },
+    {
+      icon: <Quiz sx={{ fontSize: 40, color: "success.main" }} />,
+      title: `Thi Văn Hóa Giao Thông (${catVanHoaCount})`,
+      description: "Thi theo nhóm Văn Hóa Giao Thông",
+      action: () => {
+        playClickSound();
+        navigate("/exam", { state: { mode: "cat_vanHoaGiaoThong" } });
+      },
+      buttonColor: "success",
+    },
+    {
+      icon: <Quiz sx={{ fontSize: 40, color: "secondary.main" }} />,
+      title: `Thi Kỹ Thuật Lái Xe (${catKyThuatCount})`,
+      description: "Thi theo nhóm Kỹ Thuật Lái Xe",
+      action: () => {
+        playClickSound();
+        navigate("/exam", { state: { mode: "cat_kyThuatLaiXe" } });
+      },
+      buttonColor: "secondary",
+    },
+    {
+      icon: <Quiz sx={{ fontSize: 40, color: "primary.dark" }} />,
+      title: `Thi Sa Hình (${catSaHinhCount})`,
+      description: "Thi theo nhóm Sa Hình",
+      action: () => {
+        playClickSound();
+        navigate("/exam", { state: { mode: "cat_saHinh" } });
       },
       buttonColor: "primary",
     },
@@ -268,6 +392,8 @@ const Home = () => {
         navigate("/exam", { state: { mode: "diemLiet" } });
       },
       buttonColor: "error",
+      buttonBg: "linear-gradient(45deg, #f44336 30%, #ef5350 90%)",
+      buttonHoverBg: "linear-gradient(45deg, #d32f2f 30%, #e53935 90%)",
     },
     {
       icon: <Quiz sx={{ fontSize: 40, color: "secondary.main" }} />,
@@ -281,6 +407,8 @@ const Home = () => {
         navigate("/exam", { state: { mode: "wrong" } });
       },
       buttonColor: "secondary",
+      buttonBg: "linear-gradient(45deg, #7b1fa2 30%, #ab47bc 90%)",
+      buttonHoverBg: "linear-gradient(45deg, #6a1b9a 30%, #9c27b0 90%)",
       disabled: wrongCount === 0,
     },
     {
@@ -292,6 +420,8 @@ const Home = () => {
         navigate("/exam", { state: { mode: "speed" } });
       },
       buttonColor: "warning",
+      buttonBg: "linear-gradient(45deg, #ffa000 30%, #ffb300 90%)",
+      buttonHoverBg: "linear-gradient(45deg, #fb8c00 30%, #ffa000 90%)",
     },
   ];
 
@@ -457,99 +587,127 @@ const Home = () => {
         <Typography variant="body1" color="text.secondary" sx={{ mb: 4, textAlign: "center" }}>
           Ôn tập và học các câu hỏi theo từng chủ đề
         </Typography>
-        <Grid
-          container
-          spacing={{ lg: 4, md: 4, sm: 5, xs: 4 }}
-          alignItems="stretch"
-        >
-          {studyFeatures.map((feature, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index} sx={{ display: "flex" }}>
-              <Card
-                className={`slide-in-left`}
-                style={{ animationDelay: `${index * 0.2}s` }}
-                sx={{
-                  height: "100%",
-                  width: { lg: "21.5rem", sm: "27.5rem", xs: "24rem" },
-                  display: "flex",
-                  flexDirection: "column",
-                  cursor: feature.disabled ? "not-allowed" : "pointer",
-                  opacity: feature.disabled ? 0.6 : 1,
-                  "&:hover": {
-                    transform: feature.disabled ? "none" : "translateY(-8px)",
-                    boxShadow: feature.disabled
-                      ? "none"
-                      : "0 8px 25px rgba(0, 0, 0, 0.15)",
-                  },
-                }}
-                onClick={feature.disabled ? undefined : feature.action}
-              >
-                <CardContent
+        {isMetaLoading ? (
+          <Grid container spacing={{ lg: 4, md: 4, sm: 5, xs: 4 }} alignItems="stretch">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <Grid item xs={12} sm={6} md={3} key={idx} sx={{ display: "flex" }}>
+                <Card sx={{ height: "100%", width: { lg: "21.5rem", sm: "27.5rem", xs: "24rem" } }}>
+                  <CardContent sx={{ p: 4 }}>
+                    <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+                      <Skeleton variant="circular" width={48} height={48} />
+                    </Box>
+                    <Skeleton variant="text" height={32} sx={{ mb: 1 }} />
+                    <Skeleton variant="text" height={18} width="80%" />
+                    <Skeleton variant="text" height={18} width="70%" />
+                    <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
+                      <Skeleton variant="rounded" width={140} height={40} />
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <Grid
+            container
+            spacing={{ lg: 4, md: 4, sm: 5, xs: 4 }}
+            alignItems="stretch"
+          >
+            {studyFeatures.map((feature, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index} sx={{ display: "flex" }}>
+                <Card
+                  className={`slide-in-left`}
+                  style={{ animationDelay: `${index * 0.2}s` }}
                   sx={{
-                    textAlign: "center",
-                    p: 4,
-                    flexGrow: 1,
+                    height: "100%",
+                    width: { lg: "21.5rem", sm: "27.5rem", xs: "24rem" },
                     display: "flex",
                     flexDirection: "column",
-                    justifyContent: "space-between",
+                    cursor: feature.disabled ? "not-allowed" : "pointer",
+                    opacity: feature.disabled ? 0.6 : 1,
+                    "&:hover": {
+                      transform: feature.disabled ? "none" : "translateY(-8px)",
+                      boxShadow: feature.disabled
+                        ? "none"
+                        : "0 8px 25px rgba(0, 0, 0, 0.15)",
+                    },
                   }}
+                  onClick={feature.disabled ? undefined : feature.action}
                 >
-                  <Box>
-                    <Box sx={{ mb: 2 }} className="icon-scale">
-                      {feature.icon}
-                    </Box>
-                    <Typography
-                      variant="h5"
-                      component="h2"
-                      gutterBottom
-                      sx={{ fontWeight: "bold" }}
-                    >
-                      {feature.title}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      color="text.secondary"
-                      sx={{
-                        mb: 3,
-                        mx: "auto",
-                        width: { xs: "100%", sm: 260 },
-                        wordBreak: "break-word",
-                        overflowWrap: "anywhere",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        lineHeight: 1.4,
-                        minHeight: "4.2em",
-                      }}
-                    >
-                      {feature.description}
-                    </Typography>
-                  </Box>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    onClick={feature.disabled ? undefined : feature.action}
-                    disabled={feature.disabled}
+                  <CardContent
                     sx={{
-                      minWidth: 120,
-                      backgroundColor: feature.disabled
-                        ? "grey.400"
-                        : `${feature.buttonColor}.main`,
-                      "&:hover": {
-                        backgroundColor: feature.disabled
-                          ? "grey.400"
-                          : `${feature.buttonColor}.dark`,
-                      },
+                      textAlign: "center",
+                      p: 4,
+                      flexGrow: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
                     }}
                   >
-                    {feature.disabled ? "Không khả dụng" : "Bắt đầu"}
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                    <Box>
+                      <Box sx={{ mb: 2 }} className="icon-scale">
+                        {feature.icon}
+                      </Box>
+                      <Typography
+                        variant="h5"
+                        component="h2"
+                        gutterBottom
+                        sx={{ fontWeight: "bold" }}
+                      >
+                        {feature.title}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{
+                          mb: 3,
+                          mx: "auto",
+                          width: { xs: "100%", sm: 260 },
+                          wordBreak: "break-word",
+                          overflowWrap: "anywhere",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          lineHeight: 1.4,
+                          minHeight: "4.2em",
+                        }}
+                      >
+                        {feature.description}
+                      </Typography>
+                    </Box>
+                  <Button
+                      variant="contained"
+                      size="large"
+                      onClick={feature.disabled ? undefined : feature.action}
+                      disabled={feature.disabled}
+                      sx={{
+                        minWidth: 120,
+                      background: feature.disabled
+                        ? undefined
+                        : feature.buttonBg || `${feature.buttonColor}.main`,
+                      backgroundColor: feature.disabled
+                        ? "grey.400"
+                        : undefined,
+                      "&:hover": {
+                        background: feature.disabled
+                          ? undefined
+                          : feature.buttonHoverBg || `${feature.buttonColor}.dark`,
+                        backgroundColor: feature.disabled
+                          ? "grey.400"
+                          : undefined,
+                      },
+                      }}
+                    >
+                      {feature.disabled ? "Không khả dụng" : "Bắt đầu"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Paper>
 
       {/* Chế độ thi */}
@@ -564,99 +722,127 @@ const Home = () => {
         <Typography variant="body1" color="text.secondary" sx={{ mb: 4, textAlign: "center" }}>
           Thi thử và kiểm tra kiến thức với thời gian giới hạn
         </Typography>
-        <Grid
-          container
-          spacing={{ lg: 4, md: 4, sm: 5, xs: 4 }}
-          alignItems="stretch"
-        >
-          {examFeatures.map((feature, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index} sx={{ display: "flex" }}>
-              <Card
-                className={`slide-in-left`}
-                style={{ animationDelay: `${index * 0.2}s` }}
-                sx={{
-                  height: "100%",
-                  width: { lg: "21.5rem", sm: "27.5rem", xs: "24rem" },
-                  display: "flex",
-                  flexDirection: "column",
-                  cursor: feature.disabled ? "not-allowed" : "pointer",
-                  opacity: feature.disabled ? 0.6 : 1,
-                  "&:hover": {
-                    transform: feature.disabled ? "none" : "translateY(-8px)",
-                    boxShadow: feature.disabled
-                      ? "none"
-                      : "0 8px 25px rgba(0, 0, 0, 0.15)",
-                  },
-                }}
-                onClick={feature.disabled ? undefined : feature.action}
-              >
-                <CardContent
+        {isMetaLoading ? (
+          <Grid container spacing={{ lg: 4, md: 4, sm: 5, xs: 4 }} alignItems="stretch">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <Grid item xs={12} sm={6} md={3} key={idx} sx={{ display: "flex" }}>
+                <Card sx={{ height: "100%", width: { lg: "21.5rem", sm: "27.5rem", xs: "24rem" } }}>
+                  <CardContent sx={{ p: 4 }}>
+                    <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+                      <Skeleton variant="circular" width={48} height={48} />
+                    </Box>
+                    <Skeleton variant="text" height={32} sx={{ mb: 1 }} />
+                    <Skeleton variant="text" height={18} width="80%" />
+                    <Skeleton variant="text" height={18} width="70%" />
+                    <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
+                      <Skeleton variant="rounded" width={140} height={40} />
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <Grid
+            container
+            spacing={{ lg: 4, md: 4, sm: 5, xs: 4 }}
+            alignItems="stretch"
+          >
+            {examFeatures.map((feature, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index} sx={{ display: "flex" }}>
+                <Card
+                  className={`slide-in-left`}
+                  style={{ animationDelay: `${index * 0.2}s` }}
                   sx={{
-                    textAlign: "center",
-                    p: 4,
-                    flexGrow: 1,
+                    height: "100%",
+                    width: { lg: "21.5rem", sm: "27.5rem", xs: "24rem" },
                     display: "flex",
                     flexDirection: "column",
-                    justifyContent: "space-between",
+                    cursor: feature.disabled ? "not-allowed" : "pointer",
+                    opacity: feature.disabled ? 0.6 : 1,
+                    "&:hover": {
+                      transform: feature.disabled ? "none" : "translateY(-8px)",
+                      boxShadow: feature.disabled
+                        ? "none"
+                        : "0 8px 25px rgba(0, 0, 0, 0.15)",
+                    },
                   }}
+                  onClick={feature.disabled ? undefined : feature.action}
                 >
-                  <Box>
-                    <Box sx={{ mb: 2 }} className="icon-scale">
-                      {feature.icon}
-                    </Box>
-                    <Typography
-                      variant="h5"
-                      component="h2"
-                      gutterBottom
-                      sx={{ fontWeight: "bold" }}
-                    >
-                      {feature.title}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      color="text.secondary"
-                      sx={{
-                        mb: 3,
-                        mx: "auto",
-                        width: { xs: "100%", sm: 260 },
-                        wordBreak: "break-word",
-                        overflowWrap: "anywhere",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        lineHeight: 1.4,
-                        minHeight: "4.2em",
-                      }}
-                    >
-                      {feature.description}
-                    </Typography>
-                  </Box>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    onClick={feature.disabled ? undefined : feature.action}
-                    disabled={feature.disabled}
+                  <CardContent
                     sx={{
-                      minWidth: 120,
-                      backgroundColor: feature.disabled
-                        ? "grey.400"
-                        : `${feature.buttonColor}.main`,
-                      "&:hover": {
-                        backgroundColor: feature.disabled
-                          ? "grey.400"
-                          : `${feature.buttonColor}.dark`,
-                      },
+                      textAlign: "center",
+                      p: 4,
+                      flexGrow: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
                     }}
                   >
-                    {feature.disabled ? "Không khả dụng" : "Bắt đầu"}
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                    <Box>
+                      <Box sx={{ mb: 2 }} className="icon-scale">
+                        {feature.icon}
+                      </Box>
+                      <Typography
+                        variant="h5"
+                        component="h2"
+                        gutterBottom
+                        sx={{ fontWeight: "bold" }}
+                      >
+                        {feature.title}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{
+                          mb: 3,
+                          mx: "auto",
+                          width: { xs: "100%", sm: 260 },
+                          wordBreak: "break-word",
+                          overflowWrap: "anywhere",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          lineHeight: 1.4,
+                          minHeight: "4.2em",
+                        }}
+                      >
+                        {feature.description}
+                      </Typography>
+                    </Box>
+                  <Button
+                      variant="contained"
+                      size="large"
+                      onClick={feature.disabled ? undefined : feature.action}
+                      disabled={feature.disabled}
+                      sx={{
+                        minWidth: 120,
+                      background: feature.disabled
+                        ? undefined
+                        : feature.buttonBg || `${feature.buttonColor}.main`,
+                      backgroundColor: feature.disabled
+                        ? "grey.400"
+                        : undefined,
+                      "&:hover": {
+                        background: feature.disabled
+                          ? undefined
+                          : feature.buttonHoverBg || `${feature.buttonColor}.dark`,
+                        backgroundColor: feature.disabled
+                          ? "grey.400"
+                          : undefined,
+                      },
+                      }}
+                    >
+                      {feature.disabled ? "Không khả dụng" : "Bắt đầu"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
       </Paper>
 
       {/* Thống kê */}
@@ -664,60 +850,73 @@ const Home = () => {
         <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
           Thống kê bộ câu hỏi
         </Typography>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography
-                variant="h4"
-                sx={{ fontWeight: "bold", color: "primary.main" }}
-              >
-                {totalQuestions}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Tổng số câu hỏi
-              </Typography>
-            </Box>
+        {isMetaLoading ? (
+          <Grid container spacing={3}>
+            {Array.from({ length: 4 }).map((_, idx) => (
+              <Grid item xs={12} sm={6} md={3} key={idx}>
+                <Box sx={{ textAlign: "center" }}>
+                  <Skeleton variant="text" height={44} sx={{ mx: "auto", width: 80 }} />
+                  <Skeleton variant="text" width={120} sx={{ mx: "auto" }} />
+                </Box>
+              </Grid>
+            ))}
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography
-                variant="h4"
-                sx={{ fontWeight: "bold", color: "error.main" }}
-              >
-                {diemLietCount}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Câu điểm liệt
-              </Typography>
-            </Box>
+        ) : (
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography
+                  variant="h4"
+                  sx={{ fontWeight: "bold", color: "primary.main" }}
+                >
+                  {totalQuestions}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Tổng số câu hỏi
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography
+                  variant="h4"
+                  sx={{ fontWeight: "bold", color: "error.main" }}
+                >
+                  {diemLietCount}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Câu điểm liệt
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography
+                  variant="h4"
+                  sx={{ fontWeight: "bold", color: "info.main" }}
+                >
+                  {trafficSignCount}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Câu biển báo
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Box sx={{ textAlign: "center" }}>
+                <Typography
+                  variant="h4"
+                  sx={{ fontWeight: "bold", color: "success.main" }}
+                >
+                  {Math.max(totalQuestions - diemLietCount - trafficSignCount, 0)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Câu khác
+                </Typography>
+              </Box>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography
-                variant="h4"
-                sx={{ fontWeight: "bold", color: "info.main" }}
-              >
-                {trafficSignCount}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Câu biển báo
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography
-                variant="h4"
-                sx={{ fontWeight: "bold", color: "success.main" }}
-              >
-                {Math.max(totalQuestions - diemLietCount - trafficSignCount, 0)}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Câu khác
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
+        )}
       </Paper>
 
       {/* Video hướng dẫn thi */}
